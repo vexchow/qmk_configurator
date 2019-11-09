@@ -58,7 +58,12 @@ export default [
   { name: 'xKANA', code: 'xKANA', title: 'Send LANG2 or Alt+`' },
   { width: 0 },
   { label: 'Extended keycodes', width: 'label' },
-  { name: 'LTE', code: 'EX(LTE(layer,kc))' },
-  { name: 'TLT', code: 'EX(TLT(layer1,layer2,layer3,kc))' },
-  { name: 'TDD', code: 'EX(TDD(kc1,kc2))' }
+  { name: 'LTE', code: 'EX(LTE(layer,kc))', title: 'Layer Tap Extended ' },
+  {
+    name: 'TLT',
+    code: 'EX(TLT(layer1,layer2,layer3,kc))',
+    title: 'Tri_Layer_update and Tap'
+  },
+  { name: 'TDD', code: 'EX(TDD(kc1,kc2))', title: 'Tap Dance Dual' },
+  { name: 'TDDH', code: 'EX(TDH(kc1,kc2))', title: 'Tap Dance Hold' }
 ];
