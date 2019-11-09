@@ -413,6 +413,10 @@ function getExclusionList() {
   }, {});
 }
 
+function getInternalInfoList() {
+  return ['kugel'];
+}
+
 function compileLayout(_keyboard, _keymapName, _layout) {
   disableCompileButton();
   var layers = store.getters['keymap/exportLayers']({ compiler: true });
@@ -587,6 +591,7 @@ export {
   load_converted_keymap,
   statusError,
   getExclusionList,
+  getInternalInfoList,
   compileLayout,
   enableCompileButton,
   disableCompileButton,

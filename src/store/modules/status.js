@@ -1,6 +1,7 @@
 import axios from 'axios';
 import escape from 'lodash/escape';
 import { backend_readme_url_template } from './constants';
+import { getInternalInfoList } from '@/jquery';
 
 const state = {
   message: '',
@@ -18,16 +19,21 @@ const actions = {
     commit('startScroll');
   },
   viewReadme({ state, commit }, _keyboard) {
-    return axios
-      .get(backend_readme_url_template({ keyboard: _keyboard }))
-      .then(result => {
-        if (result.status === 200) {
-          commit('clear');
-          commit('append', escape(result.data));
-          commit('append', escape(state.deferredMessage));
-          commit('deferredMessage', '');
-        }
-      });
+    if (getInternalInfoList().includes(_keyboard)) {
+      console.log('load kugel readme');
+      return {};
+    } else {
+      return axios
+        .get(backend_readme_url_template({ keyboard: _keyboard }))
+        .then(result => {
+          if (result.status === 200) {
+            commit('clear');
+            commit('append', escape(result.data));
+            commit('append', escape(state.deferredMessage));
+            commit('deferredMessage', '');
+          }
+        });
+    }
   }
 };
 const mutations = {

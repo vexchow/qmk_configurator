@@ -1,7 +1,11 @@
 import axios from 'axios';
 import isUndefined from 'lodash/isUndefined';
 import { backend_keyboards_url } from '@/store/modules/constants';
-import { getPreferredLayout, getExclusionList } from '@/jquery';
+import {
+  getPreferredLayout,
+  getExclusionList,
+  getInternalInfoList
+} from '@/jquery';
 import { localStorageSet, CONSTS } from '@/store/localStorage';
 
 const steno_keyboards = ['gergo', 'georgi'];
@@ -14,6 +18,7 @@ const actions = {
     const r = await axios.get(backend_keyboards_url);
     if (r.status === 200) {
       const exclude = getExclusionList();
+      r.data = r.data.concat(getInternalInfoList());
       const results = r.data.filter(keeb => {
         return isUndefined(exclude[keeb]);
       });
@@ -109,12 +114,22 @@ const actions = {
       });
       return p;
     }
-    return axios
-      .get(backend_keyboards_url + '/' + state.keyboard)
-      .then(resp => {
+
+    if (getInternalInfoList().includes(state.keyboard)) {
+      console.log('load_kugel');
+      const keyboardName = state.keyboard.replace(/\//g, '_');
+      return axios.get(`info/${keyboardName}_info.json`).then(resp => {
         commit('processLayouts', resp);
         return resp;
       });
+    } else {
+      return axios
+        .get(backend_keyboards_url + '/' + state.keyboard)
+        .then(resp => {
+          commit('processLayouts', resp);
+          return resp;
+        });
+    }
   },
   saveConfiguratorSettings({ state }) {
     localStorageSet(

@@ -41,7 +41,6 @@ export default [
     code: 'AD_WO_L',
     title: 'Start advertising without whitelist'
   },
-  { width: 0 },
   { label: 'Delete BLE bonding', width: 'label' },
   { name: 'DEL ID0', code: 'DEL_ID0', title: 'Delete bonding of PeerID 0' },
   { name: 'DEL ID1', code: 'DEL_ID1', title: 'Delete bonding of PeerID 1' },
@@ -52,11 +51,9 @@ export default [
   { name: 'DEL ID6', code: 'DEL_ID6', title: 'Delete bonding of PeerID 6' },
   { name: 'DEL ID7', code: 'DEL_ID7', title: 'Delete bonding of PeerID 7' },
   { name: 'DELBNDS', code: 'DELBNDS', title: 'Delete all bonding' },
-  { width: 0 },
   { label: 'Predefined macro', width: 'label' },
   { name: 'xEISU', code: 'xEISU', title: 'Send LANG1 or Alt+`' },
   { name: 'xKANA', code: 'xKANA', title: 'Send LANG2 or Alt+`' },
-  { width: 0 },
   { label: 'Extended keycodes', width: 'label' },
   { name: 'LTE', code: 'EX(LTE(layer,kc))', title: 'Layer Tap Extended ' },
   {
