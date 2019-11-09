@@ -4,8 +4,9 @@ import quantum from './quantum';
 import settings from './kb-settings';
 import media from './app-media-mouse';
 import steno from './steno';
+import bmp from './bmp';
 const state = {
-  keycodes: [...ansi, ...iso_jis, ...quantum, ...settings, ...media]
+  keycodes: [...ansi, ...iso_jis, ...quantum, ...settings, ...media, ...bmp]
 };
 
 const getters = {
@@ -33,7 +34,14 @@ const mutations = {
     ];
   },
   disableSteno(state) {
-    state.keycodes = [...ansi, ...iso_jis, ...quantum, ...settings, ...media];
+    state.keycodes = [
+      ...ansi,
+      ...iso_jis,
+      ...quantum,
+      ...settings,
+      ...media,
+      ...bmp
+    ];
   }
 };
 

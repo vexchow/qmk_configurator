@@ -15,6 +15,14 @@
             >{{ $t('message.keycodesRef.label') }}</a
           >
         </span>
+        <span class="hint-right hint">
+          <a
+            href="https://github.com/sekigon-gonnoc/BLE-Micro-Pro/blob/master/AboutDefaultFirmware/doc/bmp_custom_keycode.md"
+            title="BMP keycodes reference"
+            target="_blank"
+            >{{ $t('message.keycodesRefBmp.label') }}</a
+          >
+        </span>
       </p>
     </div>
 
@@ -146,7 +154,7 @@ export default {
   margin-bottom: -1px;
 }
 .tab-area {
-  height: 350px;
+  height: 550px;
   padding: 10px 5px;
   border: 1px solid;
   border-radius: 0 4px 4px 4px;

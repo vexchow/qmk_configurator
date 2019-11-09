@@ -86,6 +86,9 @@ export default {
       keycodesRef: {
         label: 'Keycodes reference'
       },
+      keycodesRefBmp: {
+        label: 'BLE Micro Pro keycodes reference'
+      },
       keycodesTab: {
         ANSI: {
           label: 'ANSI'
@@ -101,6 +104,9 @@ export default {
         },
         AppMediaMouse: {
           label: 'App, Media and Mouse'
+        },
+        BMP: {
+          label: 'BLE Micro Pro'
         }
       },
       settingsPanel: {
