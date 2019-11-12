@@ -82,7 +82,7 @@
         id="fileImport"
         type="file"
         ref="fileImportElement"
-        accept="application/json"
+        accept="application/json,.JSN"
         @change="fileImportChanged"
       />
       <input
