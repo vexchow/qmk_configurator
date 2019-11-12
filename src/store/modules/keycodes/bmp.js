@@ -6,7 +6,7 @@ export default [
   { name: 'SEL BLE', code: 'SEL_BLE', title: 'Select BLE HID sending' },
   { name: 'USB DIS', code: 'USB_DIS', title: 'Disable USB HID sending' },
   { name: 'USB EN', code: 'USB_EN', title: 'Enable USB HID sending' },
-  { name: 'SLE USB', code: 'SEL_USB', title: 'Select USB HID sending' },
+  { name: 'SEL USB', code: 'SEL_USB', title: 'Select USB HID sending' },
   { label: 'Mode control', width: 'label' },
   { name: 'ENT DFU', code: 'ENT_DFU', title: 'Start bootloader' },
   { name: 'ENT WEB', code: 'ENT_WEB', title: 'Start web configurator' },
