@@ -4,6 +4,7 @@ import reduce from 'lodash/reduce';
 import { PREVIEW_LABEL } from '@/store/modules/constants';
 
 const mutations = {
+  // eslint-disable-next-line no-unused-vars
   enableCompile(state) {
     // compile button is never enabled for bmp
   },
