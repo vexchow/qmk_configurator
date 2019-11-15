@@ -5,7 +5,7 @@ import { PREVIEW_LABEL } from '@/store/modules/constants';
 
 const mutations = {
   enableCompile(state) {
-    state.compileDisabled = false;
+    // compile button is never enabled for bmp
   },
   disableCompile(state) {
     state.compileDisabled = true;
