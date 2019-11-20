@@ -96,6 +96,9 @@ export default {
         'ISO/JIS': {
           label: 'ISO/JIS'
         },
+        JP: {
+          label: 'JP'
+        },
         Quantum: {
           label: 'Quantum'
         },
