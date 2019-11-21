@@ -23,7 +23,7 @@ export default [
   { name: 'Pause', code: 'KC_PAUS' },
   { width: 0 },
 
-  { name: '全角/半角', code: 'KC_ZHTG', keys: '全角/半角' },
+  { name: '半角/\n全角', code: 'KC_ZHTG', keys: '半角/\n全角' },
   { name: '!\n1', code: 'KC_1', keys: '1' },
   { name: '"\n2', code: 'KC_2', keys: '2' },
   { name: '#\n3', code: 'KC_3', keys: '3' },
