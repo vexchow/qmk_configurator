@@ -1,5 +1,6 @@
 @import './scss/qmk_colors';
 @import './scss/themes';
+@import './scss/status-bar';
 
 /*
 TO REFACTOR: import of style.css
@@ -18,267 +19,7 @@ TO REFACTOR: import of style.css
   -khtml-user-drag: element;
   -webkit-user-drag: element;
 }
-// Zekth: Seems deprecated
-// .highlight {
-//   background-color: #f8f8f8;
-//   table {
-//     td {
-//       padding: 5px;
-//     }
-//     pre {
-//       margin: 0;
-//     }
-//   }
-//   .cm {
-//     color: #999988;
-//     font-style: italic;
-//   }
-//   .cp {
-//     color: #999999;
-//     font-weight: bold;
-//   }
-//   .c1 {
-//     color: #999988;
-//     font-style: italic;
-//   }
-//   .cs {
-//     color: #999999;
-//     font-weight: bold;
-//     font-style: italic;
-//   }
-//   .c,
-//   .cd {
-//     color: #999988;
-//     font-style: italic;
-//   }
-//   .err {
-//     color: #a61717;
-//     background-color: #e3d2d2;
-//   }
-//   .gd {
-//     color: #000000;
-//     background-color: #ffdddd;
-//   }
-//   .ge {
-//     color: #000000;
-//     font-style: italic;
-//   }
-//   .gr {
-//     color: #aa0000;
-//   }
-//   .gh {
-//     color: #999999;
-//   }
-//   .gi {
-//     color: #000000;
-//     background-color: #ddffdd;
-//   }
-//   .go {
-//     color: #888888;
-//   }
-//   .gp {
-//     color: #555555;
-//   }
-//   .gs {
-//     font-weight: bold;
-//   }
-//   .gu {
-//     color: #aaaaaa;
-//   }
-//   .gt {
-//     color: #aa0000;
-//   }
-//   .kc {
-//     color: #000000;
-//     font-weight: bold;
-//   }
-//   .kd {
-//     color: #000000;
-//     font-weight: bold;
-//   }
-//   .kn {
-//     color: #000000;
-//     font-weight: bold;
-//   }
 
-//   .kp {
-//     color: #000000;
-//     font-weight: bold;
-//   }
-
-//   .kr {
-//     color: #000000;
-//     font-weight: bold;
-//   }
-
-//   .kt {
-//     color: #445588;
-//     font-weight: bold;
-//   }
-
-//   .k,
-//   .kv {
-//     color: #000000;
-//     font-weight: bold;
-//   }
-
-//   .mf {
-//     color: #009999;
-//   }
-
-//   .mh {
-//     color: #009999;
-//   }
-
-//   .il {
-//     color: #009999;
-//   }
-
-//   .mi {
-//     color: #009999;
-//   }
-
-//   .mo {
-//     color: #009999;
-//   }
-
-//   .m,
-//   .mb,
-//   .mx {
-//     color: #009999;
-//   }
-
-//   .sb {
-//     color: #d14;
-//   }
-
-//   .sc {
-//     color: #d14;
-//   }
-
-//   .sd {
-//     color: #d14;
-//   }
-
-//   .s2 {
-//     color: #d14;
-//   }
-
-//   .se {
-//     color: #d14;
-//   }
-
-//   .sh {
-//     color: #d14;
-//   }
-
-//   .si {
-//     color: #d14;
-//   }
-
-//   .sx {
-//     color: #d14;
-//   }
-
-//   .sr {
-//     color: #009926;
-//   }
-
-//   .s1 {
-//     color: #d14;
-//   }
-
-//   .ss {
-//     color: #990073;
-//   }
-
-//   .s {
-//     color: #d14;
-//   }
-
-//   .na {
-//     color: #008080;
-//   }
-
-//   .bp {
-//     color: #999999;
-//   }
-
-//   .nb {
-//     color: #0086b3;
-//   }
-
-//   .nc {
-//     color: #445588;
-//     font-weight: bold;
-//   }
-
-//   .no {
-//     color: #008080;
-//   }
-
-//   .nd {
-//     color: #3c5d5d;
-//     font-weight: bold;
-//   }
-
-//   .ni {
-//     color: #800080;
-//   }
-
-//   .ne {
-//     color: #990000;
-//     font-weight: bold;
-//   }
-
-//   .nf {
-//     color: #990000;
-//     font-weight: bold;
-//   }
-
-//   .nl {
-//     color: #990000;
-//     font-weight: bold;
-//   }
-
-//   .nn {
-//     color: #555555;
-//   }
-
-//   .nt {
-//     color: #000080;
-//   }
-
-//   .vc {
-//     color: #008080;
-//   }
-
-//   .vg {
-//     color: #008080;
-//   }
-
-//   .vi {
-//     color: #008080;
-//   }
-
-//   .nv {
-//     color: #008080;
-//   }
-
-//   .ow {
-//     color: #000000;
-//     font-weight: bold;
-//   }
-
-//   .o {
-//     color: #000000;
-//     font-weight: bold;
-//   }
-
-//   .w {
-//     color: #bbbbbb;
-//   }
-// }
 body {
   // background-color: #fff;
   padding: 50px;
@@ -527,6 +268,73 @@ a img {
   cursor: pointer;
 }
 
+#status {
+  position: relative;
+}
+
+#toggle-terminal-label {
+  cursor: pointer;
+  position: absolute;
+  top: -12px;
+  right: 59px;
+  color: #f8f8f2;
+  opacity: 0;
+  transform: scaleY(0);
+  transition: all 0.5s ease-out;
+}
+#toggle-terminal-label.collapsed {
+  opacity: 0.5;
+  color: #272822;
+  top: -22px;
+  transform: scaleY(1);
+  transition: all 0.25s 0.25s ease-out;
+}
+
+#toggle-terminal {
+  cursor: pointer;
+  position: absolute;
+  top: 4px;
+  right: 21px;
+  width: 36px;
+  height: 27px;
+  white-space: nowrap;
+  color: #f8f8f2;
+  margin: 0;
+  transition: all 0.5s ease-out;
+}
+
+#toggle-terminal.collapsed {
+  transition: all 0.5s ease-out;
+  top: -25px;
+  color: #272822;
+  transform: scaleY(-1);
+}
+
+#terminal {
+  padding: 2px 5px;
+  border: 1px solid;
+  font-family: 'Roboto Mono', Monaco, 'Bitstream Vera Sans Mono',
+    'Lucida Console', Terminal, Consolas, 'Liberation Mono', 'DejaVu Sans Mono',
+    'Courier New', monospace;
+  white-space: pre-wrap;
+  overflow-y: scroll;
+  height: 200px;
+  font-size: 12px;
+  width: 100%;
+  margin: 0px auto;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  display: block;
+  transition: all 0.5s ease-out;
+}
+
+#terminal.collapsed {
+  transition: all 0.5s ease-out;
+  height: 0px;
+  padding: 0 5px;
+}
+
 #compile {
   margin-right: 0px;
 }
@@ -559,26 +367,6 @@ button {
   font: 14px/1.5 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 14px;
   font-weight: bold;
-}
-
-#terminal {
-  padding: 2px 5px;
-  // background: #272822;
-  // color: #f8f8f2;
-  border: 1px solid;
-  font-family: 'Roboto Mono', Monaco, Bitstream Vera Sans Mono, Lucida Console,
-    Terminal, Consolas, Liberation Mono, DejaVu Sans Mono, Courier New,
-    monospace;
-  white-space: pre-wrap;
-  overflow-y: scroll;
-  height: 200px;
-  font-size: 12px;
-  width: 100%;
-  margin: 0px auto;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  display: block;
 }
 
 #controller-bottom {
@@ -977,21 +765,13 @@ input[type='number'] {
   margin-left: 5px;
 }
 
-.backend-status {
-  z-index: 3000;
-  display: grid;
-  position: fixed;
-  top: 0;
-  left: 0;
-  // background: #222;
-  // color: #bbb;
-  width: 100%;
-  grid-template: 20px / 16ch 1fr 1fr 25ch;
-  grid-template-areas: 'title status version jobs';
-  align-items: center;
-  font-size: small;
+#favorite-keyboard,
+#favorite-colorway {
+  cursor: pointer;
 }
-
+#favorite-colorway {
+  float: right;
+}
 @media print {
   .backend-status,
   .random-potato,
@@ -1006,28 +786,6 @@ input[type='number'] {
   }
 }
 
-.bes-title {
-  justify-self: start;
-}
-
-.bes-status {
-  justify-self: start;
-  // color: lightgreen;
-}
-
-// .bes-error {
-//   color: red;
-// }
-
-.bes-version {
-  justify-self: end;
-}
-
-.bes-jobs {
-  justify-self: end;
-}
-.hidden {
-  position: absolute;
-  top: -1000px;
-  left: -1000px;
+.random-potato {
+  color: #2c3e50;
 }
