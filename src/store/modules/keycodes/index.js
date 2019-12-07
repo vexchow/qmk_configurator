@@ -21,9 +21,11 @@ const state = {
   searchCounters: {
     ANSI: 0,
     'ISO/JIS': 0,
+    JP: 0,
     Quantum: 0,
     KeyboardSettings: 0,
-    AppMediaMouse: 0
+    AppMediaMouse: 0,
+    BMP: 0
   }
 };
 
@@ -76,16 +78,19 @@ const mutations = {
       ...settings,
       ...media,
       ...bmp
-    ],
+    ];
+  },
   setSearchFilter(state, newVal) {
     state.searchFilter = newVal;
     if (this.searchFilter !== '') {
       state.searchCounters = {
         ANSI: countMatches(state.searchFilter, ansi),
         'ISO/JIS': countMatches(state.searchFilter, iso_jis),
+        JP: countMatches(state.searchFilter, jp),
         Quantum: countMatches(state.searchFilter, quantum),
         KeyboardSettings: countMatches(state.searchFilter, settings),
-        AppMediaMouse: countMatches(state.searchFilter, media)
+        AppMediaMouse: countMatches(state.searchFilter, media),
+        BMP: countMatches(state.searchFilter, bmp)
       };
     }
   }

@@ -175,7 +175,7 @@ export default {
 }
 .tabs {
   display: grid;
-  grid-template: auto / repeat(6, minmax(120px, 200px));
+  grid-template: auto / repeat(8, minmax(120px, 200px));
 }
 .tab {
   text-overflow: ellipsis;
