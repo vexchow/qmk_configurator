@@ -78,6 +78,29 @@
         <font-awesome-icon icon="keyboard" size="lg" fixed-width />
         <span class="hide-small">{{ $t('message.testKeys.label') }}</span>
       </button>
+      <button
+        id="save-keymap-webBT"
+        :title="$t('message.saveKeymapWebBT.title')"
+        @click="saveKeymapWebBT"
+        v-bind:disabled="!webBtElementEnabled"
+      >
+        <font-awesome-icon icon="download" size="lg" fixed-width />
+      </button>
+      <button
+        id="connect-webBT"
+        :title="$t('message.connectWebBT.title')"
+        @click="connectWebBT"
+      >
+        {{ $t('message.connectWebBT.label') }}
+      </button>
+      <button
+        id="load-keymap-webBT"
+        :title="$t('message.loadKeymapWebBT.title')"
+        @click="loadKeymapWebBT"
+        v-bind:disabled="!webBtElementEnabled"
+      >
+        <font-awesome-icon icon="upload" size="lg" fixed-width />
+      </button>
       <input
         id="fileImport"
         type="file"
@@ -141,6 +164,14 @@ import {
 } from '@/jquery';
 
 import ElectronBottomControls from './ElectronBottomControls';
+
+import {
+  connectionToggle,
+  nusSendString,
+  sendConfig,
+  sendKeymap,
+  setCallbackFunc
+} from '@/webBT';
 
 export default {
   name: 'bottom-controller',
@@ -281,6 +312,44 @@ export default {
       }
       this.$refs.fileImportElement.click();
     },
+    connectWebBT() {
+      console.log('connectWebBT');
+      connectionToggle();
+      setCallbackFunc({
+        parser: this.loadJsonData,
+        onConnect: () => {
+          this.webBtElementEnabled = true;
+          this.$store.commit('status/append', 'WebBT connected');
+        },
+        onDisconnect: () => {
+          this.webBtElementEnabled = false;
+          this.$store.commit('status/append', 'WebBT disconnected');
+        }
+      });
+    },
+    saveKeymapWebBT() {
+      console.log('saveKeymapWebBT');
+      //Squashes the keymaps to the api payload format, might look into making this a function
+      let layers = this.$store.getters['keymap/exportLayers']({
+        compiler: false
+      });
+
+      //API payload format
+      let data = {
+        keyboard: this.keyboard,
+        keymap: this.exportKeymapName,
+        layout: this.layout,
+        layers: layers,
+        author: this.author,
+        notes: this.notes
+      };
+
+      nusSendString(JSON.stringify(data));
+    },
+    loadKeymapWebBT() {
+      console.log('loadKeymapWebBT');
+      nusSendString('show keymap');
+    },
     fileImportChanged() {
       var files = this.$refs.fileImportElement.files;
       this.reader = new FileReader();
@@ -415,6 +484,7 @@ export default {
     return {
       isVeilOpened: false,
       downloadElementEnabled: false,
+      webBtElementEnabled: false,
       urlEncodedData: '',
       filename: '',
       urlImport: '',

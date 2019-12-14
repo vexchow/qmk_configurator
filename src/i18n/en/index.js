@@ -28,6 +28,18 @@ export default {
         label: 'Compile',
         title: 'Compile Keymap'
       },
+      connectWebBT: {
+        label: 'Connect WebBT',
+        title: 'Connect WebBT'
+      },
+      loadKeymapWebBT: {
+        label: 'Load Keymap',
+        title: 'Load keymap'
+      },
+      saveKeymapWebBT: {
+        label: 'Save Keymap',
+        title: 'Save keymap'
+      },
       toggleTerminal: {
         label: 'Click to Expand',
         title: 'Toggle the Terminal display'

@@ -28,6 +28,10 @@ export default {
         label: 'Compile',
         title: 'キーマップのコンパイル'
       },
+      connectWebBT: {
+        label: 'BT Connect',
+        title: 'WebBTで接続'
+      },
       downloadKeymap: {
         title: 'keymap.c のみダウンロード',
         label: 'keymap only'
