@@ -165,13 +165,7 @@ import {
 
 import ElectronBottomControls from './ElectronBottomControls';
 
-import {
-  connectionToggle,
-  nusSendString,
-  sendConfig,
-  sendKeymap,
-  setCallbackFunc
-} from '@/webBT';
+import { toggleConnection, nusSendString, setCallbackFunc } from '@/webBT';
 
 export default {
   name: 'bottom-controller',
@@ -314,16 +308,16 @@ export default {
     },
     connectWebBT() {
       console.log('connectWebBT');
-      connectionToggle();
+      toggleConnection();
       setCallbackFunc({
         parser: this.loadJsonData,
         onConnect: () => {
           this.webBtElementEnabled = true;
-          this.$store.commit('status/append', 'WebBT connected');
+          this.$store.commit('status/append', 'WebBT connected\r\n');
         },
         onDisconnect: () => {
           this.webBtElementEnabled = false;
-          this.$store.commit('status/append', 'WebBT disconnected');
+          this.$store.commit('status/append', 'WebBT disconnected\r\n');
         }
       });
     },
@@ -344,6 +338,7 @@ export default {
         notes: this.notes
       };
 
+      // console.log(JSON.stringify(data));
       nusSendString(JSON.stringify(data));
     },
     loadKeymapWebBT() {

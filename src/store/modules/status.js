@@ -20,7 +20,7 @@ const actions = {
   },
   viewReadme({ state, commit }, _keyboard) {
     if (getInternalInfoList().includes(_keyboard)) {
-      console.log('load kugel readme');
+      console.log('loading from internal info');
       return {};
     } else {
       return axios
