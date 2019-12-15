@@ -145,6 +145,7 @@ function onDisconnected() {
 
 function handleNotifications(event) {
   console.log('notification');
+
   let value = event.target.value;
   // Convert raw data bytes to character values and use these to
   // construct a string.
@@ -158,7 +159,6 @@ function handleNotifications(event) {
     console.log(obj);
 
     jsonParseFunc(obj);
-
     str = '';
   }
 }
