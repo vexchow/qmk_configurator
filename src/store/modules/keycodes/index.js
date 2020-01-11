@@ -38,6 +38,12 @@ const getters = {
       return code === searchTerm || (isKeys && keys && keys === searchTerm);
     });
     return found;
+  },
+  lookupKeyname: state => (searchTerm, isKeys = false) => {
+    var found = state.keycodes.find(({ name, keys }) => {
+      return name === searchTerm || (isKeys && keys && keys === searchTerm);
+    });
+    return found;
   }
 };
 

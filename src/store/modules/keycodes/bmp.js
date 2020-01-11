@@ -55,12 +55,28 @@ export default [
   { name: 'xEISU', code: 'xEISU', title: 'Send LANG1 or Alt+`' },
   { name: 'xKANA', code: 'xKANA', title: 'Send LANG2 or Alt+`' },
   { label: 'Extended keycodes', width: 'label' },
-  { name: 'LTE', code: 'EX(LTE(layer,kc))', title: 'Layer Tap Extended ' },
+  {
+    name: 'LTE',
+    code: 'EX(LTE(layer,kc))',
+    type: 'text-extend',
+    title: 'Layer Tap Extended '
+  },
   {
     name: 'TLT',
     code: 'EX(TLT(layer1,layer2,layer3,kc))',
+    type: 'text-extend',
     title: 'Tri_Layer_update and Tap'
   },
-  { name: 'TDD', code: 'EX(TDD(kc1,kc2))', title: 'Tap Dance Dual' },
-  { name: 'TDDH', code: 'EX(TDH(kc1,kc2))', title: 'Tap Dance Hold' }
+  {
+    name: 'TDD',
+    code: 'EX(TDD(kc1,kc2))',
+    type: 'text-extend',
+    title: 'Tap Dance Dual'
+  },
+  {
+    name: 'TDH',
+    code: 'EX(TDH(kc1,kc2))',
+    type: 'text-extend',
+    title: 'Tap Dance Hold'
+  }
 ];

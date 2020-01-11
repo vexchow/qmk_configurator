@@ -37,6 +37,11 @@ export default {
           this.meta.contents.code
         )})`;
       }
+      if (this.meta.type === 'text-extend') {
+        return this.formatName(
+          this.breakLines(`EX(${this.meta.name}(${this.meta.text}))`)
+        );
+      }
       return this.formatName(this.breakLines(this.meta.name));
     }
   },

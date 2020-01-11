@@ -19,6 +19,7 @@ import BaseKey from '@/components/BaseKey';
 import AnyKey from '@/components/AnyKey';
 import LayerKey from '@/components/LayerKey';
 import ContainerKey from '@/components/ContainerKey';
+import ExtendKey from '@/components/ExtendKey';
 import LayerContainerKey from '@/components/LayerContainerKey';
 
 export default {
@@ -138,6 +139,8 @@ export default {
           return LayerContainerKey;
         case 'text':
           return AnyKey;
+        case 'text-extend':
+          return ExtendKey;
         default:
           return BaseKey;
       }
@@ -197,7 +200,7 @@ export default {
       height: 0
     };
   },
-  components: { BaseKey, AnyKey, LayerKey, ContainerKey }
+  components: { BaseKey, AnyKey, LayerKey, ContainerKey, ExtendKey }
 };
 </script>
 <style>

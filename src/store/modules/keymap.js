@@ -102,6 +102,9 @@ const getters = {
                 // This will be stripped back off on import.
                 keycode = compiler ? key.text : `ANY(${key.text})`;
               }
+              if (key.type === 'text-extend') {
+                keycode = `EX(${key.name}(${key.text}))`;
+              }
             } else {
               // eslint-disable-next-line
               console.error(`ERROR: unexpected keycode ${key}`, k, i, _layer);

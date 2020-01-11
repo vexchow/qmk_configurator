@@ -219,6 +219,12 @@ function newAnyKey(keycode) {
   return Object.assign({}, anyKey, { text: keycode });
 }
 
+function newExtendKey(keycode) {
+  const exkcType = keycode.match('(TLT|LTE|TDD|TDH)')[0];
+  const extendKey = store.getters['keycodes/lookupKeyname'](`${exkcType}`);
+  return Object.assign({}, extendKey, { text: keycode });
+}
+
 function newKey(metadata, keycode, obj) {
   var key = {
     name: metadata.name,
@@ -264,6 +270,9 @@ function parseKeycode(keycode, stats) {
     let internal = splitcode[1];
     internal = internal.split(')')[0];
 
+    if (maincode === 'EX') {
+      return newExtendKey(keycode);
+    }
     //Check whether it is a layer switching code or combo keycode
     if (internal.includes('KC')) {
       // Layer Tap keycode

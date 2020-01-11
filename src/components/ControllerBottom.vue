@@ -338,13 +338,13 @@ export default {
         notes: this.notes
       };
 
-      this.$store.commit('status/append', 'saving keymap to keyboard');
+      this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
       // console.log(JSON.stringify(data));
       nusSendString(JSON.stringify(data));
     },
     loadKeymapWebBT() {
       console.log('loadKeymapWebBT');
-      this.$store.commit('status/append', 'loading keymap from keyboard');
+      this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
       nusSendString('show keymap');
     },
     fileImportChanged() {
