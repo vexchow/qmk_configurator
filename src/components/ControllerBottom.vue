@@ -78,6 +78,7 @@
         <font-awesome-icon icon="keyboard" size="lg" fixed-width />
         <span class="hide-small">{{ $t('message.testKeys.label') }}</span>
       </button>
+      <br />
       <button
         id="save-keymap-webBT"
         :title="$t('message.saveKeymapWebBT.title')"

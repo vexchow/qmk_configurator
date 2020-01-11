@@ -222,7 +222,9 @@ function newAnyKey(keycode) {
 function newExtendKey(keycode) {
   const exkcType = keycode.match('(TLT|LTE|TDD|TDH)')[0];
   const extendKey = store.getters['keycodes/lookupKeyname'](`${exkcType}`);
-  return Object.assign({}, extendKey, { text: keycode });
+  return Object.assign({}, extendKey, {
+    text: keycode.split(exkcType)[1].slice(1, -2)
+  });
 }
 
 function newKey(metadata, keycode, obj) {
