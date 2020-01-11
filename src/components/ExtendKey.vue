@@ -14,7 +14,7 @@
     @dragover.prevent="dragover"
     @dragenter.prevent="dragenter"
   ><div>{{ displayName }}<div><input
-  class="key-layer-input"
+  class="key-layer-input key-layer-input-extend"
   @focus.prevent.stop="focus"
   @blur.prevent.stop="blur"
   @click.prevent.stop="clickignore"

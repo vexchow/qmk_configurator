@@ -519,6 +519,14 @@ button {
   padding-bottom: 3px;
 }
 
+.key:hover {
+  z-index:9999;
+}
+
+.key:focus-within {
+  z-index:9999;
+}
+
 // .key:empty {
 //   background: #eee;
 // }
@@ -593,6 +601,14 @@ button {
   -webkit-box-sizing: border-box;
   padding: 1px;
   text-align: center;
+}
+
+.key-layer-input-extend:focus {
+  width: 500px;
+}
+
+.key-layer-input-extend:hover{
+  width: 500px;
 }
 
 #keycodes {
