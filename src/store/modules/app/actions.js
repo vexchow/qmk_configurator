@@ -116,7 +116,7 @@ const actions = {
     }
 
     if (getInternalInfoList().includes(state.keyboard)) {
-      console.log('load_kugel');
+      console.log('load info.json from internal');
       const keyboardName = state.keyboard.replace(/\//g, '_');
       return axios.get(`info/${keyboardName}_info.json`).then(resp => {
         commit('processLayouts', resp);
