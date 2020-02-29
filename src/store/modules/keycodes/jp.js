@@ -85,7 +85,7 @@ export default [
   { name: 'k', code: 'KC_K', keys: 'k' },
   { name: 'l', code: 'KC_L', keys: 'l' },
   { name: '+\n;', code: 'KC_SCLN', keys: ';' },
-  { name: '*\n:', code: 'KC_COLN', keys: ':' },
+  { name: '*\n:', code: 'JP_COLN', keys: ':' },
   { name: '}\n]', code: 'JP_RBRC', keys: ']' },
   { width: 1250 },
   {
