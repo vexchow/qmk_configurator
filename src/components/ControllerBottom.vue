@@ -78,30 +78,6 @@
         <font-awesome-icon icon="keyboard" size="lg" fixed-width />
         <span class="hide-small">{{ $t('message.testKeys.label') }}</span>
       </button>
-      <br />
-      <button
-        id="save-keymap-webBT"
-        :title="$t('message.saveKeymapWebBT.title')"
-        @click="saveKeymapWebBT"
-        v-bind:disabled="!webBtElementEnabled"
-      >
-        <font-awesome-icon icon="download" size="lg" fixed-width />
-      </button>
-      <button
-        id="connect-webBT"
-        :title="$t('message.connectWebBT.title')"
-        @click="connectWebBT"
-      >
-        {{ $t('message.connectWebBT.label') }}
-      </button>
-      <button
-        id="load-keymap-webBT"
-        :title="$t('message.loadKeymapWebBT.title')"
-        @click="loadKeymapWebBT"
-        v-bind:disabled="!webBtElementEnabled"
-      >
-        <font-awesome-icon icon="upload" size="lg" fixed-width />
-      </button>
       <input
         id="fileImport"
         type="file"
@@ -139,6 +115,55 @@
         v-bind:download="filename"
       />
     </div>
+    <div class="botctrl-2">
+      <button
+        id="save-keymap-webBT"
+        :title="$t('message.saveKeymapWebBT.title')"
+        @click="saveKeymapWebBT"
+        v-bind:disabled="!webBtElementEnabled"
+      >
+        <font-awesome-icon icon="download" size="lg" fixed-width />
+      </button>
+      <button
+        id="connect-webBT"
+        :title="$t('message.connectWebBT.title')"
+        @click="connectWebBT"
+      >
+        {{ $t('message.connectWebBT.label') }}
+      </button>
+      <button
+        id="load-keymap-webBT"
+        :title="$t('message.loadKeymapWebBT.title')"
+        @click="loadKeymapWebBT"
+        v-bind:disabled="!webBtElementEnabled"
+        style="margin-right:10px"
+      >
+        <font-awesome-icon icon="upload" size="lg" fixed-width />
+      </button>
+      <button
+        id="save-keymap-webSerial"
+        :title="$t('message.saveKeymapWebSerial.title')"
+        @click="saveKeymapWebSerial"
+        v-bind:disabled="!webSerialElementEnabled"
+      >
+        <font-awesome-icon icon="download" size="lg" fixed-width />
+      </button>
+      <button
+        id="connect-webSerial"
+        :title="$t('message.connectWebSerial.title')"
+        @click="connectWebSerial"
+      >
+        {{ $t('message.connectWebSerial.label') }}
+      </button>
+      <button
+        id="load-keymap-webSerial"
+        :title="$t('message.loadKeymapWebSerial.title')"
+        @click="loadKeymapWebSerial"
+        v-bind:disabled="!webSerialElementEnabled"
+      >
+        <font-awesome-icon icon="upload" size="lg" fixed-width />
+      </button>
+    </div>
   </div>
 </template>
 <script>
@@ -166,7 +191,8 @@ import {
 
 import ElectronBottomControls from './ElectronBottomControls';
 
-import { toggleConnection, nusSendString, setCallbackFunc } from '@/webBT';
+import { toggleWebBtConnection, nusSendString, setCallbackFunc } from '@/webBT';
+import { toggleWebSerialConnection, setWebSerialCallback, webSerialSendString } from '@/webSerial';
 
 export default {
   name: 'bottom-controller',
@@ -309,7 +335,7 @@ export default {
     },
     connectWebBT() {
       console.log('connectWebBT');
-      toggleConnection();
+      toggleWebBtConnection();
       setCallbackFunc({
         parser: this.loadJsonData,
         onConnect: () => {
@@ -347,6 +373,47 @@ export default {
       console.log('loadKeymapWebBT');
       this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
       nusSendString('show keymap');
+    },
+    connectWebSerial() {
+      console.log('connectWebSerial');
+      toggleWebSerialConnection();
+      setWebSerialCallback({
+        parser: this.loadJsonData,
+        onConnect: () => {
+          this.webSerialElementEnabled = true;
+          this.$store.commit('status/append', 'WebSerial connected\r\n');
+        },
+        onDisconnect: () => {
+          this.webSerialElementEnabled = false;
+          this.$store.commit('status/append', 'WebBT disconnected\r\n');
+        }
+      });
+    },
+    saveKeymapWebSerial() {
+      console.log('saveKeymapWebSerial');
+      //Squashes the keymaps to the api payload format, might look into making this a function
+      let layers = this.$store.getters['keymap/exportLayers']({
+        compiler: false
+      });
+
+      //API payload format
+      let data = {
+        keyboard: this.keyboard,
+        keymap: this.exportKeymapName,
+        layout: this.layout,
+        layers: layers,
+        author: this.author,
+        notes: this.notes
+      };
+
+      this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
+      // console.log(JSON.stringify(data));
+      webSerialSendString(JSON.stringify(data));
+    },
+    loadKeymapWebSerial() {
+      console.log('loadKeymapWebSerial');
+      this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
+      webSerialSendString('map');
     },
     fileImportChanged() {
       var files = this.$refs.fileImportElement.files;
@@ -483,6 +550,7 @@ export default {
       isVeilOpened: false,
       downloadElementEnabled: false,
       webBtElementEnabled: false,
+      webSerialElementEnabled: false,
       urlEncodedData: '',
       filename: '',
       urlImport: '',

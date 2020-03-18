@@ -29,14 +29,26 @@ export default {
         title: 'Compile Keymap'
       },
       connectWebBT: {
-        label: 'Connect WebBT',
-        title: 'Connect WebBT'
+        label: 'Connect Web BT',
+        title: 'Connect Web BT'
       },
       loadKeymapWebBT: {
         label: 'Load Keymap',
         title: 'Load keymap'
       },
       saveKeymapWebBT: {
+        label: 'Save Keymap',
+        title: 'Save keymap'
+      },
+      connectWebSerial: {
+        label: 'Connect Web Serial',
+        title: 'Connect Web Serial'
+      },
+      loadKeymapWebSerial: {
+        label: 'Load Keymap',
+        title: 'Load keymap'
+      },
+      saveKeymapWebSerial: {
         label: 'Save Keymap',
         title: 'Save keymap'
       },
