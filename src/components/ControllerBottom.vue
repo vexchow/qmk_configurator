@@ -117,6 +117,11 @@
     </div>
     <div class="botctrl-2">
       <button
+        id="ble-micro-pro-configurator"
+        :title="$t('message.connectWebBT.title')"
+        @click="BleMicroProConfig"
+      ></button>
+      <button
         id="save-keymap-webBT"
         :title="$t('message.saveKeymapWebBT.title')"
         @click="saveKeymapWebBT"
@@ -192,7 +197,12 @@ import {
 import ElectronBottomControls from './ElectronBottomControls';
 
 import { toggleWebBtConnection, nusSendString, setCallbackFunc } from '@/webBT';
-import { toggleWebSerialConnection, setWebSerialCallback, webSerialSendString } from '@/webSerial';
+import {
+  toggleWebSerialConnection,
+  setWebSerialCallback,
+  webSerialSendString,
+  isWebSerialConnected
+} from '@/webSerial';
 
 export default {
   name: 'bottom-controller',
@@ -238,6 +248,17 @@ export default {
         window.setTimeout(() => this.dismissPreview());
       }
     }
+  },
+  created: () => {
+    setWebSerialCallback({
+      parser: this.loadJsonData,
+      onConnect: () => {
+        this.$store.commit('status/append', 'WebSerial connected\r\n');
+      },
+      onDisconnect: () => {
+        this.$store.commit('status/append', 'WebSerial disconnected\r\n');
+      }
+    });
   },
   methods: {
     ...mapMutations(['dismissPreview', 'stopListening', 'startListening']),
@@ -415,6 +436,9 @@ export default {
       this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
       webSerialSendString('map');
     },
+    isWebSerialDisabled() {
+      return !isWebSerialConnected();
+    },
     fileImportChanged() {
       var files = this.$refs.fileImportElement.files;
       this.reader = new FileReader();
@@ -543,6 +567,9 @@ export default {
     },
     testKeys() {
       this.$router.push('/test');
+    },
+    BleMicroProConfig() {
+      this.$router.push('/blemicropro');
     }
   },
   data: () => {

@@ -1,4 +1,3 @@
-
 import store from './store';
 
 var connected;
@@ -27,12 +26,12 @@ async function disconnect() {
   store.commit('status/append', 'disconnecting web serial...');
   if (reader) {
     await reader.cancel();
-    await inputDone.catch(()=>{});
+    await inputDone.catch(() => {});
     reader = null;
     inputDone = null;
   }
 
-  if (outputStream){
+  if (outputStream) {
     await outputStream.getWriter().close();
     await outputDone;
     outputStream = null;
@@ -49,12 +48,12 @@ async function connect() {
   if (!navigator.serial) {
     console.log(
       'WebSerial API is not available.\r\n' +
-      'Please make sure the Web Serial flag is enabled.'
+        'Please make sure the Web Serial flag is enabled.'
     );
     store.commit(
       'status/append',
       'WebSerial API is not available.\r\n' +
-      'Please make sure the Web Serial flag is enabled.'
+        'Please make sure the Web Serial flag is enabled.'
     );
     return;
   }
@@ -68,7 +67,7 @@ async function connect() {
 
   port = await navigator.serial.requestPort();
 
-  await port.open({ baudrate: 9600, buffersize: 8192 });
+  await port.open({ baudrate: 9600, buffersize: 81920 });
 
   connected = true;
   onConnect();
@@ -93,7 +92,7 @@ function setWebSerialCallback(callback_) {
   parser = callback_.parser;
 }
 
-function responseParser(json){
+function responseParser(json) {
   console.log(json);
   parser(json);
 }
@@ -106,14 +105,22 @@ async function readLoop() {
 
       if (str.indexOf('\0') != -1) {
         str = str.split('\0')[0];
-        str = '{' + str.split('{')[1];
+        str =
+          '{' +
+          str
+            .split('{')
+            .slice(1)
+            .join('{');
         try {
           let json = JSON.parse(str);
           responseParser(json);
         } catch (e) {
+          console.log(str);
           store.commit(
             'status/append',
-            'Failed to read data from BLE Micro Pro. Please try again.\r\n');
+            'Failed to read data from BLE Micro Pro. Please try again.\r\n'
+          );
+          store.commit('status/startScroll');
         }
         str = '';
       }
@@ -134,5 +141,13 @@ function webSerialSendString(message) {
   writer.releaseLock();
 }
 
+function isWebSerialConnected() {
+  return connected;
+}
 
-export { toggleWebSerialConnection, setWebSerialCallback, webSerialSendString };
+export {
+  toggleWebSerialConnection,
+  setWebSerialCallback,
+  webSerialSendString,
+  isWebSerialConnected
+};

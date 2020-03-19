@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Home from './views/Home.vue';
 import Print from './views/Print.vue';
 import Test from './views/Test.vue';
+import BleMicroPro from './views/BleMicroPro.vue';
 
 Vue.use(Router);
 
@@ -11,6 +12,7 @@ export default new Router({
     { path: '/:keyboardP(.+)/:layoutP(.+)', component: Home, name: 'home' },
     { path: '/print', component: Print, name: 'print' },
     { path: '/test', component: Test, name: 'test' },
+    { path: '/blemicropro', component: BleMicroPro, name: 'blemicropro' },
     { path: '*', component: Home }
   ]
 });
