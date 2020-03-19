@@ -10,6 +10,7 @@
     </div>
     <div><button @click="connectWebSerial">Connect BMP</button></div>
     <div><button @click="getConfig">getConfig</button></div>
+    <div><input @keyup.enter="sendCmd" id="cmd" /></div>
   </div>
 </template>
 
@@ -52,6 +53,11 @@ export default {
     },
     getConfig() {
       webSerialSendString('conf');
+    },
+    sendCmd() {
+      let cmd = document.getElementById('cmd');
+      webSerialSendString(cmd.value);
+      cmd.value = '';
     }
   }
 };

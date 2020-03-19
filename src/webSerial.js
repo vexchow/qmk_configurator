@@ -67,18 +67,19 @@ async function connect() {
 
   port = await navigator.serial.requestPort();
 
-  await port.open({ baudrate: 9600, buffersize: 81920 });
+  await port.open({ baudrate: 115200, buffersize: 81920 });
 
   connected = true;
   onConnect();
 
   // setup reader
   let decoder = new TextDecoderStream();
-  inputDone = port.readable.pipeTo(decoder.writable);
-  inputStream = decoder.readable;
+  // inputDone = port.readable.pipeTo(decoder.writable);
+  port.readable.pipeThrough(new TextDecoderStream()).pipeTo(appendStream);
+  // inputStream = decoder.readable;
 
-  reader = inputStream.getReader();
-  readLoop();
+  // reader = inputStream.getReader();
+  // readLoop();
 
   // setup writer
   const encoder = new TextEncoderStream();
@@ -97,25 +98,46 @@ function responseParser(json) {
   parser(json);
 }
 
+var appendStream = new WritableStream({
+  write(chunk) {
+    str += chunk;
+    console.log(chunk);
+    if (str.indexOf('\0') != -1) {
+      str = str.split('\0')[0];
+      str = str.substring(str.indexOf('{'));
+      try {
+        let json = JSON.parse(str);
+        responseParser(json);
+      } catch (e) {
+        console.log(str);
+        console.log(e);
+        store.commit(
+          'status/append',
+          'failed to read data from ble micro pro. please try again.\r\n'
+        );
+        store.commit('status/startscroll');
+      }
+      str = '';
+    }
+  }
+});
+
 async function readLoop() {
   while (true) {
     const { value, done } = await reader.read();
+    console.log(value);
     if (value) {
       str += value;
 
       if (str.indexOf('\0') != -1) {
         str = str.split('\0')[0];
-        str =
-          '{' +
-          str
-            .split('{')
-            .slice(1)
-            .join('{');
+        str = str.substring(str.indexOf('{'));
         try {
           let json = JSON.parse(str);
           responseParser(json);
         } catch (e) {
           console.log(str);
+          console.log(e);
           store.commit(
             'status/append',
             'Failed to read data from BLE Micro Pro. Please try again.\r\n'
