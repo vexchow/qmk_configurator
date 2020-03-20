@@ -95,7 +95,22 @@ function setWebSerialCallback(callback_) {
 
 function responseParser(json) {
   console.log(json);
-  parser(json);
+
+  if (json.layers) {
+    parser(json);
+  } else if (json.dmsg) {
+    store.commit('status/append', json.dmsg);
+    store.commit('status/startScroll');
+  } else if (json.log) {
+    store.commit('status/append', json.log);
+    store.commit('status/startScroll');
+  }
+  store.commit('status/startScroll');
+}
+
+function replacer(match) {
+  // replace line feed in quoted string to \\n
+  return match.replace(/(\n|\r\n|\n\r)/g, '\\r\\n');
 }
 
 var appendStream = new WritableStream({
@@ -103,19 +118,28 @@ var appendStream = new WritableStream({
     str += chunk;
     console.log(chunk);
     if (str.indexOf('\0') != -1) {
-      str = str.split('\0')[0];
-      str = str.substring(str.indexOf('{'));
-      try {
-        let json = JSON.parse(str);
-        responseParser(json);
-      } catch (e) {
-        console.log(str);
-        console.log(e);
-        store.commit(
-          'status/append',
-          'failed to read data from ble micro pro. please try again.\r\n'
-        );
-        store.commit('status/startscroll');
+      let strs = str.split('\0');
+      for (str of strs) {
+        if (str.search(/{(\s|\S)*}/gm) == -1) {
+          continue;
+        }
+
+        // replace line feed in quoted string to \\n
+        str = str.replace(/"[^"]*"/g, replacer);
+        str = str.substring(str.indexOf('{'));
+        try {
+          let json = JSON.parse(str);
+          responseParser(json);
+        } catch (e) {
+          console.log(e);
+          store.commit(
+            'status/append',
+            'failed to read data from ble micro pro. please try again.\r\n\r\nbroken data:\r\n' +
+              str +
+              '\r\n'
+          );
+          store.commit('status/startScroll');
+        }
       }
       str = '';
     }
