@@ -96,14 +96,14 @@ function setWebSerialCallback(callback_) {
 function responseParser(json) {
   console.log(json);
 
-  if (json.layers) {
-    parser(json);
-  } else if (json.dmsg) {
+  if (json.dmsg) {
     store.commit('status/append', json.dmsg);
     store.commit('status/startScroll');
   } else if (json.log) {
     store.commit('status/append', json.log);
     store.commit('status/startScroll');
+  } else {
+    parser(json);
   }
   store.commit('status/startScroll');
 }

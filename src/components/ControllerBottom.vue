@@ -118,9 +118,11 @@
     <div class="botctrl-2">
       <button
         id="ble-micro-pro-configurator"
-        :title="$t('message.connectWebBT.title')"
         @click="BleMicroProConfig"
-      ></button>
+        style="margin-right:10px"
+      >
+        BMP CONSOLE
+      </button>
       <button
         id="save-keymap-webBT"
         :title="$t('message.saveKeymapWebBT.title')"

@@ -4,12 +4,14 @@
       <font-awesome-icon icon="chevron-left" size="lg" fixed-width />
       {{ $t('message.tester.back.label') }}
     </button>
-    BLE Micro Pro configurator
+    <div class="title-text">BLE Micro Pro configurator</div>
     <div ref="console">
       <statusPanel />
     </div>
     <div><button @click="connectWebSerial">Connect BMP</button></div>
     <div><button @click="getConfig">getConfig</button></div>
+    <div><button @click="setConfig">setConfig</button></div>
+    <div><bmpConfigEditor /></div>
     <div><input @keyup.enter="sendCmd" id="cmd" /></div>
   </div>
 </template>
@@ -17,6 +19,7 @@
 <script>
 import { mapState, mapMutations } from 'vuex';
 import StatusPanel from '@/components/StatusPanel';
+import BmpConfigEditor from '@/components/BmpConfigEditor';
 import {
   toggleWebSerialConnection,
   setWebSerialCallback,
@@ -25,9 +28,12 @@ import {
 
 export default {
   name: 'blemicropro',
-  components: { StatusPanel },
+  components: { StatusPanel, BmpConfigEditor },
   computed: {
     ...mapState('app', ['keyboard', 'layout'])
+  },
+  data: () => {
+    return {};
   },
   methods: {
     gohome() {
@@ -35,6 +41,9 @@ export default {
     },
     loadJsonData(data) {
       this.$store.commit('status/append', data + '\r\n');
+      if (data.config) {
+        this.config = data.config;
+      }
     },
     connectWebSerial() {
       console.log('connectWebSerial');
@@ -54,6 +63,10 @@ export default {
     getConfig() {
       webSerialSendString('conf');
     },
+    setConfig() {
+      console.log('set config.json');
+      console.log(JSON.stringify({ config: this.config }));
+    },
     sendCmd() {
       let cmd = document.getElementById('cmd');
       webSerialSendString(cmd.value);
@@ -63,4 +76,11 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+#status >>> #terminal {
+  height: 400px;
+}
+#status >>> #terminal.collapsed {
+  height: 0px;
+}
+</style>
