@@ -203,6 +203,7 @@ import {
   toggleWebSerialConnection,
   setWebSerialCallback,
   webSerialSendString,
+  webSerialSendStringln,
   isWebSerialConnected
 } from '@/webSerial';
 
@@ -429,14 +430,16 @@ export default {
         notes: this.notes
       };
 
+      let str = JSON.stringify(data);
+
       this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
       // console.log(JSON.stringify(data));
-      webSerialSendString(JSON.stringify(data));
+      webSerialSendStringln('file keymap\n' + str + '\x00\x03');
     },
     loadKeymapWebSerial() {
       console.log('loadKeymapWebSerial');
       this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
-      webSerialSendString('map');
+      webSerialSendStringln('map');
     },
     isWebSerialDisabled() {
       return !isWebSerialConnected();

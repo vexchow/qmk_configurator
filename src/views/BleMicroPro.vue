@@ -23,7 +23,7 @@ import BmpConfigEditor from '@/components/BmpConfigEditor';
 import {
   toggleWebSerialConnection,
   setWebSerialCallback,
-  webSerialSendString
+  webSerialSendStringln
 } from '@/webSerial';
 
 export default {
@@ -61,7 +61,7 @@ export default {
       });
     },
     getConfig() {
-      webSerialSendString('conf');
+      webSerialSendStringln('conf');
     },
     setConfig() {
       console.log('set config.json');
@@ -69,7 +69,7 @@ export default {
     },
     sendCmd() {
       let cmd = document.getElementById('cmd');
-      webSerialSendString(cmd.value);
+      webSerialSendStringln(cmd.value);
       cmd.value = '';
     }
   }

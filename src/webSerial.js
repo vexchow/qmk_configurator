@@ -74,12 +74,11 @@ async function connect() {
 
   // setup reader
   let decoder = new TextDecoderStream();
-  // inputDone = port.readable.pipeTo(decoder.writable);
-  port.readable.pipeThrough(new TextDecoderStream()).pipeTo(appendStream);
-  // inputStream = decoder.readable;
+  inputDone = port.readable.pipeTo(decoder.writable);
+  inputStream = decoder.readable;
 
-  // reader = inputStream.getReader();
-  // readLoop();
+  reader = inputStream.getReader();
+  readLoop();
 
   // setup writer
   const encoder = new TextEncoderStream();
@@ -154,24 +153,32 @@ async function readLoop() {
       str += value;
 
       if (str.indexOf('\0') != -1) {
-        str = str.split('\0')[0];
-        str = str.substring(str.indexOf('{'));
-        try {
-          let json = JSON.parse(str);
-          responseParser(json);
-        } catch (e) {
-          console.log(str);
-          console.log(e);
-          store.commit(
-            'status/append',
-            'Failed to read data from BLE Micro Pro. Please try again.\r\n'
-          );
-          store.commit('status/startScroll');
+        let strs = str.split('\0');
+        for (str of strs) {
+          if (str.search(/{(\s|\S)*}/gm) == -1) {
+            continue;
+          }
+
+          // replace line feed in quoted string to \\n
+          str = str.replace(/"[^"]*"/g, replacer);
+          str = str.substring(str.indexOf('{'));
+          try {
+            let json = JSON.parse(str);
+            responseParser(json);
+          } catch (e) {
+            console.log(e);
+            store.commit(
+              'status/append',
+              'failed to read data from ble micro pro. please try again.\r\n\r\nbroken data:\r\n' +
+              str +
+              '\r\n'
+            );
+            store.commit('status/startScroll');
+          }
         }
         str = '';
       }
     }
-
     if (done) {
       console.log('Web serial read complete', done);
       reader.releaseLock();
@@ -181,10 +188,23 @@ async function readLoop() {
   }
 }
 
-function webSerialSendString(message) {
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function webSerialSendString(message) {
   const writer = outputStream.getWriter();
-  writer.write(message + '\n');
+
+  for (let index = 0; index <message.length; index+=64) {
+    writer.write(message.slice(index, index + 64));
+    await sleep(30);
+  }
+
   writer.releaseLock();
+}
+
+function webSerialSendStringln(message) {
+  webSerialSendString(message + '\n');
 }
 
 function isWebSerialConnected() {
@@ -195,5 +215,6 @@ export {
   toggleWebSerialConnection,
   setWebSerialCallback,
   webSerialSendString,
+  webSerialSendStringln,
   isWebSerialConnected
 };

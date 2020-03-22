@@ -4,77 +4,9 @@
       <summary>
         Config
       </summary>
-      <details>
-        <summary>
-          Device
-        </summary>
-        <div>
-          PID:<input
-            type="text"
-            name="pid"
-            id="pid"
-            v-model="config.device_info.pid"
-          />
-        </div>
-        <div>
-          VID:<input
-            type="text"
-            name="vid"
-            id="vid"
-            v-model="config.device_info.vid"
-          />
-        </div>
-        <div>
-          NAME:<input
-            type="text"
-            name="name"
-            id="name"
-            v-model="config.device_info.name"
-          />
-        </div>
-        <div>
-          MANUFACTURE:<input
-            type="text"
-            name="manufacture"
-            id="manufacture"
-            v-model="config.device_info.manufacture"
-          />
-        </div>
-        <div>
-          DESCRIPTION:<input
-            type="text"
-            name="description"
-            id="description"
-            v-model="config.device_info.description"
-          />
-        </div>
-      </details>
-      <details>
-        <summary>
-          Matrix
-        </summary>
-        <div>
-          ROWS:<input
-            type="number"
-            name="rows"
-            id="rows"
-            v-model="config.matrix.rows"
-          />
-        </div>
-        <div>
-          COLS:<input
-            type="number"
-            name="cols"
-            id="cols"
-            v-model="config.matrix.cols"
-          />
-        </div>
-      </details>
-      <details>
-        <summary>
-          BLE Params
-        </summary>
-      </details>
+      <pre id="config">
+        {{JSON.stringify({config: this.config}, null, '\t')}}
+      </pre>
     </details>
     <button v-on:click="importConfigFile">
       IMPORT CONFIG
@@ -180,4 +112,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+#config {
+  text-align: left
+}
+</style>
