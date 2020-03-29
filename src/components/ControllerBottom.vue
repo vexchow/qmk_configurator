@@ -170,6 +170,14 @@
       >
         <font-awesome-icon icon="upload" size="lg" fixed-width />
       </button>
+      <button
+        id="save-keymap-to-rom"
+        @click="saveToRomWebSerial"
+        style="margin-left:10px"
+        v-bind:disabled="!webSerialElementEnabled"
+      >
+        <font-awesome-icon icon="save" size="lg" fixed-width />
+      </button>
     </div>
   </div>
 </template>
@@ -201,7 +209,7 @@ import ElectronBottomControls from './ElectronBottomControls';
 import { toggleWebBtConnection, nusSendString, setCallbackFunc } from '@/webBT';
 import { WebSerial } from '@/webSerial';
 
-Vue.prototype.$webSerial = new WebSerial();
+Vue.prototype.$webSerial = new WebSerial(64, 30);
 
 export default {
   name: 'bottom-controller',
@@ -393,6 +401,9 @@ export default {
       if (this.serial_rcv.indexOf('\0') != -1) {
         let strs = this.serial_rcv.split('\0');
         for (let str of strs.slice(0, -1)) {
+          if (str.search(/{[\s\S]*}/gm) == -1) {
+            continue;
+          }
           str = str.substring(str.indexOf('{'));
           str = str.replace(/\"[\s\S]*?\"/gm, replacer);
           try {
@@ -402,7 +413,7 @@ export default {
             } else if (json.dmsg) {
               this.$store.commit('status/append', json.dmsg);
             } else if (json.log) {
-              this.$store.commit('status/append', json.log);
+              this.$store.commit('status/append', json.log + '\r\n');
             }
           } catch (e) {
             this.$store.commit(
@@ -411,6 +422,8 @@ export default {
                 'invalid data:' +
                 str
             );
+          } finally {
+            this.$store.commit('status/startScroll');
           }
         }
         this.serial_rcv = '';
@@ -431,22 +444,16 @@ export default {
         );
         await this.$webSerial.open();
         this.webSerialElementEnabled = true;
+
+        this.$webSerial.writeString = (msg) => {
+          this.$webSerial.write(new TextEncoder().encode(msg));
+        };
+
+        // enable debug message
+        await this.$webSerial.writeString('\n\ndebug on\n');
       }
-      // console.log('connectWebSerial');
-      // toggleWebSerialConnection();
-      // setWebSerialCallback({
-      //   parser: this.loadJsonData,
-      //   onConnect: () => {
-      //     this.webSerialElementEnabled = true;
-      //     this.$store.commit('status/append', 'WebSerial connected\r\n');
-      //   },
-      //   onDisconnect: () => {
-      //     this.webSerialElementEnabled = false;
-      //     this.$store.commit('status/append', 'WebBT disconnected\r\n');
-      //   }
-      // });
     },
-    saveKeymapWebSerial() {
+    async saveKeymapWebSerial() {
       console.log('saveKeymapWebSerial');
       //Squashes the keymaps to the api payload format, might look into making this a function
       let layers = this.$store.getters['keymap/exportLayers']({
@@ -466,15 +473,20 @@ export default {
       let str = JSON.stringify(data);
 
       this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
-      console.log(JSON.stringify(data));
-      this.$webSerial.write(
-        new TextEncoder().encode('file keymap\n' + str + '\x00\x03')
-      );
+      console.log(str);
+
+      let send_data = new TextEncoder().encode('file keymap\n' + str + '\x00\x03');
+
+      await this.$webSerial.write(send_data);
     },
     loadKeymapWebSerial() {
       console.log('loadKeymapWebSerial');
       this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
       this.$webSerial.write(new TextEncoder().encode('map\n'));
+    },
+    saveToRomWebSerial() {
+      console.log('save keymap to rom');
+      this.$webSerial.writeString('\0\nupdate 1\n');
     },
     fileImportChanged() {
       var files = this.$refs.fileImportElement.files;
