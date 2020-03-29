@@ -136,7 +136,7 @@
         :title="$t('message.connectWebBT.title')"
         @click="connectWebBT"
       >
-        {{ $t('message.connectWebBT.label') }}
+        CONNECT BY BT
       </button>
       <button
         id="load-keymap-webBT"
@@ -148,9 +148,9 @@
         <font-awesome-icon icon="upload" size="lg" fixed-width />
       </button>
       <button
-        id="save-keymap-webSerial"
-        :title="$t('message.saveKeymapWebSerial.title')"
-        @click="saveKeymapWebSerial"
+        id="send-keymap-webSerial"
+        :title="$t('message.sendKeymapWebSerial.title')"
+        @click="sendKeymapWebSerial"
         v-bind:disabled="!webSerialElementEnabled"
       >
         <font-awesome-icon icon="download" size="lg" fixed-width />
@@ -160,12 +160,12 @@
         :title="$t('message.connectWebSerial.title')"
         @click="connectWebSerial"
       >
-        {{ $t('message.connectWebSerial.label') }}
+        CONNECT BY SERIAL
       </button>
       <button
         id="load-keymap-webSerial"
-        :title="$t('message.loadKeymapWebSerial.title')"
-        @click="loadKeymapWebSerial"
+        :title="$t('message.readKeymapWebSerial.title')"
+        @click="readKeymapWebSerial"
         v-bind:disabled="!webSerialElementEnabled"
       >
         <font-awesome-icon icon="upload" size="lg" fixed-width />
@@ -173,7 +173,7 @@
       <button
         id="save-keymap-to-rom"
         @click="saveToRomWebSerial"
-        title="save keymap from RAM to ROM"
+        title="Save keymap from RAM to ROM"
         style="margin-left:10px"
         v-bind:disabled="!webSerialElementEnabled"
       >
@@ -454,8 +454,8 @@ export default {
         await this.$webSerial.writeString('\n\ndebug on\n');
       }
     },
-    async saveKeymapWebSerial() {
-      console.log('saveKeymapWebSerial');
+    async sendKeymapWebSerial() {
+      console.log('sendKeymapWebSerial');
       //Squashes the keymaps to the api payload format, might look into making this a function
       let layers = this.$store.getters['keymap/exportLayers']({
         compiler: false
@@ -480,8 +480,8 @@ export default {
       await this.$webSerial.writeString('\0\nfile keymap\n' + str + '\x00\x03');
       // await this.$store.commit('app/setShowSpinner', false);
     },
-    loadKeymapWebSerial() {
-      console.log('loadKeymapWebSerial');
+    readKeymapWebSerial() {
+      console.log('readKeymapWebSerial');
       this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
       this.$webSerial.writeString('\0\nmap\n');
     },

@@ -41,16 +41,16 @@ export default {
         title: 'Save keymap'
       },
       connectWebSerial: {
-        label: 'Connect Web Serial',
-        title: 'Connect Web Serial'
+        label: 'Connect BLE Micro Pro by Web Serial',
+        title: 'Connect BLE Micro Pro by Web Serial'
       },
-      loadKeymapWebSerial: {
-        label: 'Load Keymap',
-        title: 'Load keymap'
+      readKeymapWebSerial: {
+        label: 'Read Keymap from BLE Micro Pro',
+        title: 'Read keymap from BLE Micro Pro'
       },
-      saveKeymapWebSerial: {
-        label: 'Write keymap to RAM',
-        title: 'Write keymap to RAM'
+      sendKeymapWebSerial: {
+        label: 'Send keymap to BLE Micro Pro',
+        title: 'Send keymap to BLE Micro Pro'
       },
       toggleTerminal: {
         label: 'Click to Expand',
