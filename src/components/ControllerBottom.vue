@@ -396,27 +396,34 @@ export default {
       nusSendString('show keymap');
     },
     serialRecvCallback(array) {
+
+      let replacer = (match, offset, string)=>{
+        console.log(match);
+        return match.replace(/(\n|\r\n|\n\r)/gm, '\\n');
+      }
       this.serial_rcv += String.fromCharCode.apply(null, array);
 
       if (this.serial_rcv.indexOf('\0') != -1) {
-        let str = this.serial_rcv.split('\0')[0];
-        str = '{' + str.split('{')[1];
-        console.log(this.serial_rcv);
-        try {
-          let json = JSON.parse(str);
-          console.log(json);
-          if (json.layers) {
-            this.loadJsonData(json);
-          }else if (json.msg) {
-            this.$store.commit('status/append', json.msg + '\r\n');
+        let strs = this.serial_rcv.split('\0');
+        for (let str of strs.slice(0,-1)) {
+          str = str.substring(str.indexOf('{'));
+          str = str.replace(/\"[\s\S]*?\"/gm, replacer);
+          try {
+            let json = JSON.parse(str);
+            if (json.layers) {
+              this.loadJsonData(json);
+            }else if (json.dmsg) {
+              this.$store.commit('status/append', json.dmsg);
+            }
+            else if (json.log) {
+              this.$store.commit('status/append', json.log);
+            }
+          } catch (e) {
+            this.$store.commit(
+                'status/append',
+                'Failed to read data from BLE Micro Pro. Please try again.\r\n' +
+                'invalid data:' + str);
           }
-          else if (json.log) {
-            this.$store.commit('status/append', json.log + '\r\n');
-          }
-        } catch (e) {
-          this.$store.commit(
-              'status/append',
-              'Failed to read data from BLE Micro Pro. Please try again.\r\n');
         }
         this.serial_rcv = '';
       }
