@@ -199,13 +199,9 @@ import {
 import ElectronBottomControls from './ElectronBottomControls';
 
 import { toggleWebBtConnection, nusSendString, setCallbackFunc } from '@/webBT';
-import {
-  toggleWebSerialConnection,
-  setWebSerialCallback,
-  webSerialSendString,
-  webSerialSendStringln,
-  isWebSerialConnected
-} from '@/webSerial';
+import { WebSerial } from '@/webSerial';
+
+Vue.prototype.$webSerial = new WebSerial;
 
 export default {
   name: 'bottom-controller',
@@ -221,7 +217,7 @@ export default {
       'keymapSourceURL',
       'author',
       'notes',
-      'electron'
+      'electron',
     ]),
     ...mapGetters(['exportKeymapName', 'firmwareFile']),
     disableDownloadKeymap() {
@@ -252,17 +248,17 @@ export default {
       }
     }
   },
-  created: () => {
-    setWebSerialCallback({
-      parser: this.loadJsonData,
-      onConnect: () => {
-        this.$store.commit('status/append', 'WebSerial connected\r\n');
-      },
-      onDisconnect: () => {
-        this.$store.commit('status/append', 'WebSerial disconnected\r\n');
-      }
-    });
-  },
+  // created: () => {
+  //   setWebSerialCallback({
+  //     parser: this.loadJsonData,
+  //     onConnect: () => {
+  //       this.$store.commit('status/append', 'WebSerial connected\r\n');
+  //     },
+  //     onDisconnect: () => {
+  //       this.$store.commit('status/append', 'WebSerial disconnected\r\n');
+  //     }
+  //   });
+  // },
   methods: {
     ...mapMutations(['dismissPreview', 'stopListening', 'startListening']),
     ...mapActions(['loadKeymapFromUrl']),
@@ -386,7 +382,8 @@ export default {
         layout: this.layout,
         layers: layers,
         author: this.author,
-        notes: this.notes
+        notes: this.notes,
+        serial_rcv: ""
       };
 
       this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
@@ -398,51 +395,85 @@ export default {
       this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
       nusSendString('show keymap');
     },
-    connectWebSerial() {
-      console.log('connectWebSerial');
-      toggleWebSerialConnection();
-      setWebSerialCallback({
-        parser: this.loadJsonData,
-        onConnect: () => {
-          this.webSerialElementEnabled = true;
-          this.$store.commit('status/append', 'WebSerial connected\r\n');
-        },
-        onDisconnect: () => {
-          this.webSerialElementEnabled = false;
-          this.$store.commit('status/append', 'WebBT disconnected\r\n');
+    serialRecvCallback(array) {
+      this.serial_rcv += String.fromCharCode.apply(null, array);
+
+      if (this.serial_rcv.indexOf('\0') != -1) {
+        let str = this.serial_rcv.split('\0')[0];
+        str = '{' + str.split('{')[1];
+        console.log(this.serial_rcv);
+        try {
+          let json = JSON.parse(str);
+          console.log(json);
+          if (json.layers) {
+            this.loadJsonData(json);
+          }else if (json.msg) {
+            this.$store.commit('status/append', json.msg + '\r\n');
+          }
+          else if (json.log) {
+            this.$store.commit('status/append', json.log + '\r\n');
+          }
+        } catch (e) {
+          this.$store.commit(
+              'status/append',
+              'Failed to read data from BLE Micro Pro. Please try again.\r\n');
         }
-      });
+        this.serial_rcv = '';
+      }
+    },
+    async connectWebSerial() {
+      console.log('connectWebSerial');
+
+
+      if (this.$webSerial.connected) {
+        await this.$webSerial.close();
+        this.webSerialElementEnabled = false;
+      } else {
+        this.$webSerial.setReceiveCallback(this.serialRecvCallback.bind(this));
+        await this.$webSerial.open();
+        this.webSerialElementEnabled = true;
+      }
+      // console.log('connectWebSerial');
+      // toggleWebSerialConnection();
+      // setWebSerialCallback({
+      //   parser: this.loadJsonData,
+      //   onConnect: () => {
+      //     this.webSerialElementEnabled = true;
+      //     this.$store.commit('status/append', 'WebSerial connected\r\n');
+      //   },
+      //   onDisconnect: () => {
+      //     this.webSerialElementEnabled = false;
+      //     this.$store.commit('status/append', 'WebBT disconnected\r\n');
+      //   }
+      // });
     },
     saveKeymapWebSerial() {
-      console.log('saveKeymapWebSerial');
-      //Squashes the keymaps to the api payload format, might look into making this a function
-      let layers = this.$store.getters['keymap/exportLayers']({
-        compiler: false
-      });
+       console.log('saveKeymapWebSerial');
+       //Squashes the keymaps to the api payload format, might look into making this a function
+       let layers = this.$store.getters['keymap/exportLayers']({
+         compiler: false
+       });
 
-      //API payload format
-      let data = {
-        keyboard: this.keyboard,
-        keymap: this.exportKeymapName,
-        layout: this.layout,
-        layers: layers,
-        author: this.author,
-        notes: this.notes
-      };
+       //API payload format
+       let data = {
+         keyboard: this.keyboard,
+         keymap: this.exportKeymapName,
+         layout: this.layout,
+         layers: layers,
+         author: this.author,
+         notes: this.notes
+       };
 
-      let str = JSON.stringify(data);
+       let str = JSON.stringify(data);
 
-      this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
-      // console.log(JSON.stringify(data));
-      webSerialSendStringln('file keymap\n' + str + '\x00\x03');
+       this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
+       console.log(JSON.stringify(data));
+       this.$webSerial.write(new TextEncoder().encode('file keymap\n' + str + '\x00\x03'));
     },
     loadKeymapWebSerial() {
       console.log('loadKeymapWebSerial');
       this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
-      webSerialSendStringln('map');
-    },
-    isWebSerialDisabled() {
-      return !isWebSerialConnected();
+      this.$webSerial.write(new TextEncoder().encode('map\n'));
     },
     fileImportChanged() {
       var files = this.$refs.fileImportElement.files;
