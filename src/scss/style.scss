@@ -310,6 +310,57 @@ a img {
   transform: scaleY(-1);
 }
 
+#expand-terminal-label.expanded {
+  cursor: pointer;
+  position: absolute;
+  bottom: 12px;
+  right: 59px;
+  color: #f8f8f2;
+  opacity: 0;
+  transform: scaleY(0);
+  transition: all 0.5s ease-out;
+}
+
+#expand-terminal {
+  cursor: pointer;
+  position: absolute;
+  top: 30px;
+  right: 21px;
+  width: 36px;
+  height: 27px;
+  white-space: nowrap;
+  color: #f8f8f2;
+  margin: 0;
+  transition: all 0.5s ease-out;
+  transform: scaleY(-1);
+}
+
+#expand-terminal.expanded {
+  transition: all 0.5s ease-out;
+  top: initial;
+  bottom: 25px;
+  color: #f8f8f2;
+  transform: initial;
+}
+
+#expand-terminal.collapsed {
+  display: none;
+}
+
+#clear-terminal {
+  cursor: pointer;
+  position: absolute;
+  top: 8px;
+  right: 60px;
+  color: #f8f8f2;
+  margin: 0;
+}
+
+#clear-terminal.collapsed {
+  display: none;
+}
+
+
 #terminal {
   padding: 2px 5px;
   border: 1px solid;
@@ -333,6 +384,11 @@ a img {
   transition: all 0.5s ease-out;
   height: 0px;
   padding: 0 5px;
+}
+
+#terminal.expanded {
+  transition: all 0.5s ease-out;
+  height: 400px;
 }
 
 #compile {
