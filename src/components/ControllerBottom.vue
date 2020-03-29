@@ -173,6 +173,7 @@
       <button
         id="save-keymap-to-rom"
         @click="saveToRomWebSerial"
+        title="save keymap from RAM to ROM"
         style="margin-left:10px"
         v-bind:disabled="!webSerialElementEnabled"
       >
@@ -446,7 +447,7 @@ export default {
         this.webSerialElementEnabled = true;
 
         this.$webSerial.writeString = (msg) => {
-          this.$webSerial.write(new TextEncoder().encode(msg));
+          return this.$webSerial.write(new TextEncoder().encode(msg));
         };
 
         // enable debug message
@@ -472,17 +473,17 @@ export default {
 
       let str = JSON.stringify(data);
 
-      this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
+      await this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
       console.log(str);
 
-      let send_data = new TextEncoder().encode('file keymap\n' + str + '\x00\x03');
-
-      await this.$webSerial.write(send_data);
+      // await this.$store.commit('app/setShowSpinner', true);
+      await this.$webSerial.writeString('\0\nfile keymap\n' + str + '\x00\x03');
+      // await this.$store.commit('app/setShowSpinner', false);
     },
     loadKeymapWebSerial() {
       console.log('loadKeymapWebSerial');
       this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
-      this.$webSerial.write(new TextEncoder().encode('map\n'));
+      this.$webSerial.writeString('\0\nmap\n');
     },
     saveToRomWebSerial() {
       console.log('save keymap to rom');

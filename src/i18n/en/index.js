@@ -49,8 +49,8 @@ export default {
         title: 'Load keymap'
       },
       saveKeymapWebSerial: {
-        label: 'Save Keymap',
-        title: 'Save keymap'
+        label: 'Write keymap to RAM',
+        title: 'Write keymap to RAM'
       },
       toggleTerminal: {
         label: 'Click to Expand',
