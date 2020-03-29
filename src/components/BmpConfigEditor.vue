@@ -5,7 +5,7 @@
         Config
       </summary>
       <pre id="config">
-        {{JSON.stringify({config: this.config}, null, '\t')}}
+        {{ JSON.stringify({ config: this.config }, null, '\t') }}
       </pre>
     </details>
     <button v-on:click="importConfigFile">
@@ -114,6 +114,6 @@ export default {
 
 <style>
 #config {
-  text-align: left
+  text-align: left;
 }
 </style>

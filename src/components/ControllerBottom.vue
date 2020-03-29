@@ -201,7 +201,7 @@ import ElectronBottomControls from './ElectronBottomControls';
 import { toggleWebBtConnection, nusSendString, setCallbackFunc } from '@/webBT';
 import { WebSerial } from '@/webSerial';
 
-Vue.prototype.$webSerial = new WebSerial;
+Vue.prototype.$webSerial = new WebSerial();
 
 export default {
   name: 'bottom-controller',
@@ -217,7 +217,7 @@ export default {
       'keymapSourceURL',
       'author',
       'notes',
-      'electron',
+      'electron'
     ]),
     ...mapGetters(['exportKeymapName', 'firmwareFile']),
     disableDownloadKeymap() {
@@ -248,17 +248,6 @@ export default {
       }
     }
   },
-  // created: () => {
-  //   setWebSerialCallback({
-  //     parser: this.loadJsonData,
-  //     onConnect: () => {
-  //       this.$store.commit('status/append', 'WebSerial connected\r\n');
-  //     },
-  //     onDisconnect: () => {
-  //       this.$store.commit('status/append', 'WebSerial disconnected\r\n');
-  //     }
-  //   });
-  // },
   methods: {
     ...mapMutations(['dismissPreview', 'stopListening', 'startListening']),
     ...mapActions(['loadKeymapFromUrl']),
@@ -383,7 +372,7 @@ export default {
         layers: layers,
         author: this.author,
         notes: this.notes,
-        serial_rcv: ""
+        serial_rcv: ''
       };
 
       this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
@@ -396,33 +385,32 @@ export default {
       nusSendString('show keymap');
     },
     serialRecvCallback(array) {
-
-      let replacer = (match, offset, string)=>{
-        console.log(match);
+      let replacer = (match, offset, string) => {
         return match.replace(/(\n|\r\n|\n\r)/gm, '\\n');
-      }
+      };
       this.serial_rcv += String.fromCharCode.apply(null, array);
 
       if (this.serial_rcv.indexOf('\0') != -1) {
         let strs = this.serial_rcv.split('\0');
-        for (let str of strs.slice(0,-1)) {
+        for (let str of strs.slice(0, -1)) {
           str = str.substring(str.indexOf('{'));
           str = str.replace(/\"[\s\S]*?\"/gm, replacer);
           try {
             let json = JSON.parse(str);
             if (json.layers) {
               this.loadJsonData(json);
-            }else if (json.dmsg) {
+            } else if (json.dmsg) {
               this.$store.commit('status/append', json.dmsg);
-            }
-            else if (json.log) {
+            } else if (json.log) {
               this.$store.commit('status/append', json.log);
             }
           } catch (e) {
             this.$store.commit(
-                'status/append',
-                'Failed to read data from BLE Micro Pro. Please try again.\r\n' +
-                'invalid data:' + str);
+              'status/append',
+              'Failed to read data from BLE Micro Pro. Please try again.\r\n' +
+                'invalid data:' +
+                str
+            );
           }
         }
         this.serial_rcv = '';
@@ -431,12 +419,16 @@ export default {
     async connectWebSerial() {
       console.log('connectWebSerial');
 
-
       if (this.$webSerial.connected) {
         await this.$webSerial.close();
         this.webSerialElementEnabled = false;
       } else {
         this.$webSerial.setReceiveCallback(this.serialRecvCallback.bind(this));
+        this.$webSerial.setCloseCallback(
+          (() => {
+            this.webSerialElementEnabled = false;
+          }).bind(this)
+        );
         await this.$webSerial.open();
         this.webSerialElementEnabled = true;
       }
@@ -455,27 +447,29 @@ export default {
       // });
     },
     saveKeymapWebSerial() {
-       console.log('saveKeymapWebSerial');
-       //Squashes the keymaps to the api payload format, might look into making this a function
-       let layers = this.$store.getters['keymap/exportLayers']({
-         compiler: false
-       });
+      console.log('saveKeymapWebSerial');
+      //Squashes the keymaps to the api payload format, might look into making this a function
+      let layers = this.$store.getters['keymap/exportLayers']({
+        compiler: false
+      });
 
-       //API payload format
-       let data = {
-         keyboard: this.keyboard,
-         keymap: this.exportKeymapName,
-         layout: this.layout,
-         layers: layers,
-         author: this.author,
-         notes: this.notes
-       };
+      //API payload format
+      let data = {
+        keyboard: this.keyboard,
+        keymap: this.exportKeymapName,
+        layout: this.layout,
+        layers: layers,
+        author: this.author,
+        notes: this.notes
+      };
 
-       let str = JSON.stringify(data);
+      let str = JSON.stringify(data);
 
-       this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
-       console.log(JSON.stringify(data));
-       this.$webSerial.write(new TextEncoder().encode('file keymap\n' + str + '\x00\x03'));
+      this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
+      console.log(JSON.stringify(data));
+      this.$webSerial.write(
+        new TextEncoder().encode('file keymap\n' + str + '\x00\x03')
+      );
     },
     loadKeymapWebSerial() {
       console.log('loadKeymapWebSerial');
