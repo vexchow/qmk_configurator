@@ -115,71 +115,7 @@
         v-bind:download="filename"
       />
     </div>
-    <div class="botctrl-2">
-      <button
-        id="ble-micro-pro-configurator"
-        @click="BleMicroProConfig"
-        style="margin-right:10px"
-      >
-        BMP CONSOLE
-      </button>
-      <button
-        id="save-keymap-webBT"
-        :title="$t('message.saveKeymapWebBT.title')"
-        @click="saveKeymapWebBT"
-        v-bind:disabled="!webBtElementEnabled"
-      >
-        <font-awesome-icon icon="download" size="lg" fixed-width />
-      </button>
-      <button
-        id="connect-webBT"
-        :title="$t('message.connectWebBT.title')"
-        @click="connectWebBT"
-      >
-        CONNECT BY BT
-      </button>
-      <button
-        id="load-keymap-webBT"
-        :title="$t('message.loadKeymapWebBT.title')"
-        @click="loadKeymapWebBT"
-        v-bind:disabled="!webBtElementEnabled"
-        style="margin-right:10px"
-      >
-        <font-awesome-icon icon="upload" size="lg" fixed-width />
-      </button>
-      <button
-        id="send-keymap-webSerial"
-        :title="$t('message.sendKeymapWebSerial.title')"
-        @click="sendKeymapWebSerial"
-        v-bind:disabled="!webSerialElementEnabled"
-      >
-        <font-awesome-icon icon="download" size="lg" fixed-width />
-      </button>
-      <button
-        id="connect-webSerial"
-        :title="$t('message.connectWebSerial.title')"
-        @click="connectWebSerial"
-      >
-        CONNECT BY SERIAL
-      </button>
-      <button
-        id="load-keymap-webSerial"
-        :title="$t('message.readKeymapWebSerial.title')"
-        @click="readKeymapWebSerial"
-        v-bind:disabled="!webSerialElementEnabled"
-      >
-        <font-awesome-icon icon="upload" size="lg" fixed-width />
-      </button>
-      <button
-        id="save-keymap-to-rom"
-        @click="saveToRomWebSerial"
-        title="Save keymap from RAM to ROM"
-        style="margin-left:10px"
-        v-bind:disabled="!webSerialElementEnabled"
-      >
-        <font-awesome-icon icon="save" size="lg" fixed-width />
-      </button>
-    </div>
+    <BleMicroProControls @receive-keymap="receiveKeymap"> </BleMicroProControls>
   </div>
 </template>
 <script>
@@ -206,15 +142,11 @@ import {
 } from '@/jquery';
 
 import ElectronBottomControls from './ElectronBottomControls';
-
-import { toggleWebBtConnection, nusSendString, setCallbackFunc } from '@/webBT';
-import { WebSerial } from '@/webSerial';
-
-Vue.prototype.$webSerial = new WebSerial(64, 30);
+import BleMicroProControls from './BleMicroProControls';
 
 export default {
   name: 'bottom-controller',
-  components: { ElectronBottomControls },
+  components: { ElectronBottomControls, BleMicroProControls },
   computed: {
     ...mapState([
       'keyboard',
@@ -351,144 +283,6 @@ export default {
       }
       this.$refs.fileImportElement.click();
     },
-    connectWebBT() {
-      console.log('connectWebBT');
-      toggleWebBtConnection();
-      setCallbackFunc({
-        parser: this.loadJsonData,
-        onConnect: () => {
-          this.webBtElementEnabled = true;
-          this.$store.commit('status/append', 'WebBT connected\r\n');
-        },
-        onDisconnect: () => {
-          this.webBtElementEnabled = false;
-          this.$store.commit('status/append', 'WebBT disconnected\r\n');
-        }
-      });
-    },
-    saveKeymapWebBT() {
-      console.log('saveKeymapWebBT');
-      //Squashes the keymaps to the api payload format, might look into making this a function
-      let layers = this.$store.getters['keymap/exportLayers']({
-        compiler: false
-      });
-
-      //API payload format
-      let data = {
-        keyboard: this.keyboard,
-        keymap: this.exportKeymapName,
-        layout: this.layout,
-        layers: layers,
-        author: this.author,
-        notes: this.notes,
-        serial_rcv: ''
-      };
-
-      this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
-      // console.log(JSON.stringify(data));
-      nusSendString(JSON.stringify(data));
-    },
-    loadKeymapWebBT() {
-      console.log('loadKeymapWebBT');
-      this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
-      nusSendString('show keymap');
-    },
-    serialRecvCallback(array) {
-      let replacer = (match, offset, string) => {
-        return match.replace(/(\n|\r\n|\n\r)/gm, '\\n');
-      };
-      this.serial_rcv += String.fromCharCode.apply(null, array);
-
-      if (this.serial_rcv.indexOf('\0') != -1) {
-        let strs = this.serial_rcv.split('\0');
-        for (let str of strs.slice(0, -1)) {
-          if (str.search(/{[\s\S]*}/gm) == -1) {
-            continue;
-          }
-          str = str.substring(str.indexOf('{'));
-          str = str.replace(/\"[\s\S]*?\"/gm, replacer);
-          try {
-            let json = JSON.parse(str);
-            if (json.layers) {
-              this.loadJsonData(json);
-            } else if (json.dmsg) {
-              this.$store.commit('status/append', json.dmsg);
-            } else if (json.log) {
-              this.$store.commit('status/append', json.log + '\r\n');
-            }
-          } catch (e) {
-            this.$store.commit(
-              'status/append',
-              'Failed to read data from BLE Micro Pro. Please try again.\r\n' +
-                'invalid data:' +
-                str
-            );
-          } finally {
-            this.$store.commit('status/startScroll');
-          }
-        }
-        this.serial_rcv = '';
-      }
-    },
-    async connectWebSerial() {
-      console.log('connectWebSerial');
-
-      if (this.$webSerial.connected) {
-        await this.$webSerial.close();
-        this.webSerialElementEnabled = false;
-      } else {
-        this.$webSerial.setReceiveCallback(this.serialRecvCallback.bind(this));
-        this.$webSerial.setCloseCallback(
-          (() => {
-            this.webSerialElementEnabled = false;
-          }).bind(this)
-        );
-        await this.$webSerial.open();
-        this.webSerialElementEnabled = true;
-
-        this.$webSerial.writeString = (msg) => {
-          return this.$webSerial.write(new TextEncoder().encode(msg));
-        };
-
-        // enable debug message
-        await this.$webSerial.writeString('\n\ndebug on\n');
-      }
-    },
-    async sendKeymapWebSerial() {
-      console.log('sendKeymapWebSerial');
-      //Squashes the keymaps to the api payload format, might look into making this a function
-      let layers = this.$store.getters['keymap/exportLayers']({
-        compiler: false
-      });
-
-      //API payload format
-      let data = {
-        keyboard: this.keyboard,
-        keymap: this.exportKeymapName,
-        layout: this.layout,
-        layers: layers,
-        author: this.author,
-        notes: this.notes
-      };
-
-      let str = JSON.stringify(data);
-
-      await this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
-      console.log(str);
-
-      // await this.$store.commit('app/setShowSpinner', true);
-      await this.$webSerial.writeString('\0\nfile keymap\n' + str + '\x00\x03');
-      // await this.$store.commit('app/setShowSpinner', false);
-    },
-    readKeymapWebSerial() {
-      console.log('readKeymapWebSerial');
-      this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
-      this.$webSerial.writeString('\0\nmap\n');
-    },
-    saveToRomWebSerial() {
-      console.log('save keymap to rom');
-      this.$webSerial.writeString('\0\nupdate 1\n');
-    },
     fileImportChanged() {
       var files = this.$refs.fileImportElement.files;
       this.reader = new FileReader();
@@ -618,16 +412,15 @@ export default {
     testKeys() {
       this.$router.push('/test');
     },
-    BleMicroProConfig() {
-      this.$router.push('/blemicropro');
-    }
+    receiveKeymap(json) {
+      console.log('receive keymap', json);
+      this.loadJsonData(json);
+    },
   },
   data: () => {
     return {
       isVeilOpened: false,
       downloadElementEnabled: false,
-      webBtElementEnabled: false,
-      webSerialElementEnabled: false,
       urlEncodedData: '',
       filename: '',
       urlImport: '',
