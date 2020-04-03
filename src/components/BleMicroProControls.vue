@@ -56,11 +56,30 @@
     >
       <font-awesome-icon icon="save" size="lg" fixed-width />
     </button>
+    <button
+      id="get-version"
+      @click="getVersion"
+      v-bind:disabled="!webSerialElementEnabled"
+    >
+      VERSION
+    </button>
+    <label style="margin-left:10px"
+      >COMMAND
+      <input
+        type="text"
+        id="command-input"
+        @focus="focus"
+        @blur="blur"
+        @keyup.enter="sendCommand"
+        v-bind:disabled="!webSerialElementEnabled"
+    /></label>
   </div>
 </template>
 
 <script>
 import Vue from 'vue';
+import { mapMutations } from 'vuex';
+
 import { toggleConnection, nusSendString, setCallbackFunc } from '@/webBT';
 import { WebSerial } from '@/webSerial';
 
@@ -69,6 +88,7 @@ Vue.prototype.$webSerial = new WebSerial(64, 30);
 export default {
   name: 'ble-micro-pro-control',
   methods: {
+    ...mapMutations('app', ['stopListening', 'startListening']),
     connectWebBT() {
       console.log('connectWebBT');
       toggleConnection();
@@ -136,6 +156,15 @@ export default {
               this.$store.commit('status/append', json.dmsg);
             } else if (json.log) {
               this.$store.commit('status/append', json.log + '\r\n');
+            } else if (json.version) {
+              this.$store.commit(
+                'status/append',
+                'Bootloader Version:' + json.version.bootloader + '\r\n\r\n'
+              );
+              this.$store.commit(
+                'status/append',
+                'Application Version:\r\n' + json.version.app + '\r\n'
+              );
             }
           } catch (e) {
             this.$store.commit(
@@ -224,6 +253,23 @@ export default {
     },
     BleMicroProConfig() {
       this.$router.push('/blemicropro');
+    },
+    getVersion() {
+      this.$store.commit(
+        'status/append',
+        'Get version of BLE Micro Pro...\r\n'
+      );
+      this.$webSerial.writeString('\0\nversion\n');
+    },
+    sendCommand(e) {
+      this.$webSerial.writeString(e.target.value + '\n');
+      e.target.value = '';
+    },
+    focus() {
+      this.stopListening();
+    },
+    blur() {
+      this.startListening();
     }
   },
   data: () => {
