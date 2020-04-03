@@ -26,7 +26,7 @@
     </button>
     <button
       id="send-keymap-webSerial"
-      :title="$t('message.sendKeymapWebSerial.title')"
+      title="Send keymap.json to BLE Micro Pro"
       @click="sendKeymapWebSerial"
       v-bind:disabled="!webSerialElementEnabled"
     >
@@ -34,14 +34,14 @@
     </button>
     <button
       id="connect-webSerial"
-      :title="$t('message.connectWebSerial.title')"
+      title="Connect to BLE Micro Pro by WebSerial"
       @click="connectWebSerial"
     >
       CONNECT BY SERIAL
     </button>
     <button
       id="load-keymap-webSerial"
-      :title="$t('message.readKeymapWebSerial.title')"
+      title="Read keymap.json from BLE Micro Pro"
       @click="readKeymapWebSerial"
       v-bind:disabled="!webSerialElementEnabled"
     >
@@ -50,7 +50,7 @@
     <button
       id="save-keymap-to-rom"
       @click="saveToRomWebSerial"
-      title="Save keymap from RAM to ROM"
+      title="Save keymap.json to storage of BLE Micro Pro"
       style="margin-left:10px"
       v-bind:disabled="!webSerialElementEnabled"
     >
