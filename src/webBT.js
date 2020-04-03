@@ -36,7 +36,7 @@ function toggleConnection() {
 
 function connect() {
   if (!navigator.bluetooth) {
-    console.log(
+    console.error(
       'WebBluetooth API is not available.\r\n' +
         'Please make sure the Web Bluetooth flag is enabled.'
     );

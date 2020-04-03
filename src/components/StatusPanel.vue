@@ -23,6 +23,30 @@
       :class="terminalClasses"
       @click="toggleTerminal"
     />
+    <!-- <label                                             -->
+    <!--   for="expand-terminal"                            -->
+    <!--   id="expand-terminal-label"                       -->
+    <!--   :class="terminalClasses"                         -->
+    <!--   @click="expandTerminal"                          -->
+    <!--   >{{ $t('message.expandTerminal.label') }}</label -->
+    <!-- >                                                  -->
+    <font-awesome-icon
+      icon="chevron-up"
+      size="lg"
+      fixed-width
+      id="expand-terminal"
+      :title="$t('message.expandTerminal.title')"
+      :class="terminalClasses"
+      @click="expandTerminal"
+    />
+    <font-awesome-icon
+      icon="trash"
+      size="lg"
+      fixed-width
+      id="clear-terminal"
+      :class="terminalClasses"
+      @click="clearTerminal"
+    />
   </div>
 </template>
 <script>
@@ -57,6 +81,12 @@ export default {
      */
     toggleTerminal() {
       this.isTerminalOpen = !this.isTerminalOpen;
+    },
+    expandTerminal() {
+      this.isTerminalExpanded = !this.isTerminalExpanded;
+    },
+    clearTerminal() {
+      this.$store.commit('status/clear');
     }
   },
   computed: {
@@ -66,13 +96,16 @@ export default {
       const classes = [];
       if (!this.isTerminalOpen) {
         classes.push('collapsed');
+      } else if (this.isTerminalExpanded) {
+        classes.push('expanded');
       }
       return classes.join(' ');
     }
   },
   data: () => {
     return {
-      isTerminalOpen: true
+      isTerminalOpen: true,
+      isTerminalExpanded: false
     };
   }
 };

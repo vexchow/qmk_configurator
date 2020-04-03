@@ -41,7 +41,8 @@ import {
   faMagic,
   faStar,
   faChevronUp,
-  faSearch
+  faSearch,
+  faSave
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faApple,
@@ -88,7 +89,8 @@ const icons = [
   faTrash,
   faUndo,
   faUpload,
-  faWindows
+  faWindows,
+  faSave
 ];
 library.add(...icons);
 
