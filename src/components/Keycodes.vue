@@ -6,13 +6,14 @@
   <div id="keycodes-section">
     <div style="text-align: left; margin-left: 10px;">
       <p>
-        <label>{{ $t('message.keycodes.label') }}:</label>
-        <span class="hint-right hint">
+        <label>{{ $t('keycodes.label') }}:</label>
+        <span class="hint">
           <a
             href="https://docs.qmk.fm/#/keycodes"
-            title="Keycodes reference"
+            :title="$t('keycodesRef.label')"
             target="_blank"
-            >{{ $t('message.keycodesRef.label') }}</a
+            rel="noopener"
+            >{{ $t('keycodesRef.label') }}</a
           >
         </span>
         <span class="hint-right hint">
@@ -33,8 +34,8 @@
           v-for="(key, index) in keycodesByGroup"
           :key="index"
           @click="changeActive(index)"
-          :title="$t('message.keycodesTab.' + index + '.label')"
-          >{{ $t('message.keycodesTab.' + index + '.label')
+          :title="$t('keycodesTab.' + index + '.label')"
+          >{{ $t('keycodesTab.' + index + '.label')
           }}<span v-if="searchFilter !== ''"
             >({{ searchCounters[index] }})</span
           ></span
@@ -44,7 +45,7 @@
             @focus="stopListening"
             @blur="startListening"
             type="text"
-            :placeholder="$t('message.searchKeycodes')"
+            :placeholder="$t('searchKeycodes')"
             v-model="searchFilter_"
             autocomplete="off"
             spellcheck="false"
@@ -216,8 +217,8 @@ export default {
 .keycode.isoenter {
   position: absolute;
   left: 520px;
-  top: 115px;
-  height: 68px;
+  top: 117px;
+  height: 69px;
 }
 .desaturated {
   opacity: 0.3;

@@ -23,60 +23,48 @@
       <button
         class="fixed-size"
         id="toolbox"
-        :title="$t('message.downloadKeymap.title')"
+        :title="$t('downloadKeymap.title')"
         @click="downloadKeymap"
         v-bind:disabled="disableDownloadKeymap"
       >
         <font-awesome-icon icon="download" size="lg" fixed-width />
-        {{ $t('message.downloadKeymap.label') }}
+        {{ $t('downloadKeymap.label') }}
       </button>
       <button
         class="fixed-size"
         id="source"
         @click="downloadSource"
-        :title="$t('message.downloadSource.title')"
+        :title="$t('downloadSource.title')"
         v-bind:disabled="disableDownloadSource"
       >
         <font-awesome-icon icon="download" size="lg" fixed-width />
-        {{ $t('message.downloadSource.label') }}
+        {{ $t('downloadSource.label') }}
       </button>
-      <button
-        id="export"
-        @click="exportJSON"
-        :title="$t('message.downloadJSON.title')"
-      >
+      <button id="export" @click="exportJSON" :title="$t('downloadJSON.title')">
         <font-awesome-icon icon="download" size="lg" fixed-width />
       </button>
-      <span class="label-button">{{ $t('message.downloadJSON.label') }}</span>
-      <button
-        id="import"
-        :title="$t('message.importJSON.title')"
-        @click="importKeymap"
-      >
+      <span class="label-button">{{ $t('downloadJSON.label') }}</span>
+      <button id="import" :title="$t('importJSON.title')" @click="importKeymap">
         <font-awesome-icon icon="upload" size="lg" fixed-width />
       </button>
       <button
         id="import-url"
-        :title="$t('message.importUrlJSON.title')"
+        :title="$t('importUrlJSON.title')"
         @click="openVeil"
       >
         <font-awesome-icon icon="cloud-upload-alt" size="lg" fixed-width />
       </button>
       <button
         id="printkeymaps"
-        :title="$t('message.printKeymap.title')"
+        :title="$t('printKeymap.title')"
         @click="printKeymaps"
       >
         <font-awesome-icon icon="print" size="lg" fixed-width />
-        <span class="hide-small">{{ $t('message.printKeymap.label') }}</span>
+        <span class="hide-small">{{ $t('printKeymap.label') }}</span>
       </button>
-      <button
-        id="testkeys"
-        :title="$t('message.testKeys.title')"
-        @click="testKeys"
-      >
+      <button id="testkeys" :title="$t('testKeys.title')" @click="testKeys">
         <font-awesome-icon icon="keyboard" size="lg" fixed-width />
-        <span class="hide-small">{{ $t('message.testKeys.label') }}</span>
+        <span class="hide-small">{{ $t('testKeys.label') }}</span>
       </button>
       <br />
       <button
@@ -125,11 +113,11 @@
       <button
         id="fwFile"
         @click="downloadFirmware"
-        :title="$t('message.downloadFirmware.title')"
+        :title="$t('downloadFirmware.title')"
         v-bind:disabled="disableDownloadBinary"
       >
         <font-awesome-icon icon="download" size="lg" fixed-width />
-        {{ $t('message.downloadFirmware.label') }}
+        {{ $t('downloadFirmware.label') }}
       </button>
     </div>
     <div v-if="downloadElementEnabled">
@@ -143,17 +131,10 @@
 </template>
 <script>
 import Vue from 'vue';
-import { createNamespacedHelpers } from 'vuex';
-const {
-  mapMutations,
-  mapActions,
-  mapState,
-  mapGetters
-} = createNamespacedHelpers('app');
+import { mapMutations, mapActions, mapState, mapGetters } from 'vuex';
 import first from 'lodash/first';
 import isUndefined from 'lodash/isUndefined';
 import escape from 'lodash/escape';
-const encoding = 'data:text/plain;charset=utf-8,';
 import { clearKeymapTemplate } from '@/common.js';
 import { PREVIEW_LABEL } from '@/store/modules/constants';
 import {
@@ -166,13 +147,15 @@ import {
 
 import ElectronBottomControls from './ElectronBottomControls';
 
-import { toggleConnection, nusSendString, setCallbackFunc } from '@/webBT';
+import remap from '@/remap';
+
+const encoding = 'data:application/json;charset=utf-8,';
 
 export default {
   name: 'bottom-controller',
   components: { ElectronBottomControls },
   computed: {
-    ...mapState([
+    ...mapState('app', [
       'keyboard',
       'layout',
       'previewRequested',
@@ -184,7 +167,8 @@ export default {
       'notes',
       'electron'
     ]),
-    ...mapGetters(['exportKeymapName', 'firmwareFile']),
+    ...mapGetters('app', ['exportKeymapName', 'firmwareFile']),
+    ...mapGetters('keymap', ['isDirty']),
     disableDownloadKeymap() {
       return !this.enableDownloads && this.keymapSourceURL !== '';
     },
@@ -214,8 +198,27 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['dismissPreview', 'stopListening', 'startListening']),
-    ...mapActions(['loadKeymapFromUrl']),
+    ...mapMutations('app', [
+      'dismissPreview',
+      'enablePreview',
+      'setAuthor',
+      'setKeyboard',
+      'setKeymapName',
+      'setLayout',
+      'setNotes',
+      'startListening',
+      'stopListening'
+    ]),
+    ...mapMutations('keymap', ['setLoadingKeymapPromise', 'setDirty', 'clear']),
+    ...mapMutations('keymap', { clearKeymap: 'clear' }),
+    ...mapMutations('status', ['deferredMessage', 'append']),
+    ...mapMutations('status', { clearStatus: 'clear' }),
+    ...mapActions('app', [
+      'changeKeyboard',
+      'loadKeymapFromUrl',
+      'loadLayouts'
+    ]),
+    ...mapActions('status', ['viewReadme']),
     importUrlkeymap: function() {
       this.loadKeymapFromUrl(this.urlImport)
         .then(data => {
@@ -254,10 +257,7 @@ export default {
         notes: this.notes
       };
 
-      this.download(
-        `${this.$store.getters['app/exportKeymapName']}.json`,
-        JSON.stringify(data)
-      );
+      this.download(this.exportKeymapName, JSON.stringify(data));
     },
     download(filename, data) {
       this.urlEncodedData = encoding + encodeURIComponent(data);
@@ -270,7 +270,7 @@ export default {
     },
     downloadFirmware() {
       this.urlEncodedData = first(this.firmwareBinaryURL);
-      this.filename = this.$store.getters['app/firmwareFile'];
+      this.filename = this.firmwareFile;
       this.downloadElementEnabled = true;
       Vue.nextTick(() => {
         this.$refs.downloadElement.click();
@@ -296,7 +296,7 @@ export default {
       });
     },
     importKeymap() {
-      if (this.$store.getters['keymap/isDirty']) {
+      if (this.isDirty) {
         if (
           !confirm(
             clearKeymapTemplate({ action: 'change keyboard and layout' })
@@ -355,14 +355,37 @@ export default {
       this.reader.readAsText(first(files));
       this.$refs.fileImportElement.value = ''; // clear value for chrome issue #83
     },
+    // remap old keymap.json files to current locations and layouts
+    // This is recursive, but it's limited to a maximum depth of 10
+    remapKeyboard(keyboard, layout, depth = 0) {
+      let wasRemapped = false;
+      if (depth > 10) {
+        console.warn(`possible remap loop detected with ${keyboard}:${layout}`);
+      } else {
+        if (!isUndefined(remap.lookup[keyboard])) {
+          const { target, layouts } = remap.lookup[keyboard];
+          if (!isUndefined(target)) {
+            keyboard = target;
+            wasRemapped = true;
+          }
+          if (!isUndefined(layouts) && !isUndefined(layouts[layout])) {
+            layout = layouts[layout];
+            wasRemapped = true;
+          }
+        }
+      }
+      return wasRemapped
+        ? this.remapKeyboard(keyboard, layout, ++depth)
+        : { keyboard, layout };
+    },
     loadJsonData(data) {
       if (data.version && data.keyboard && data.keyboard.settings) {
-        alert(this.$t('message.errors.kbfirmwareJSONUnsupported'));
+        alert(this.$t('errors.kbfirmwareJSONUnsupported'));
         return;
       }
 
       if (checkInvalidKeymap(data)) {
-        alert(this.$t('message.errors.unknownJSON'));
+        alert(this.$t('errors.unknownJSON'));
         return;
       }
 
@@ -370,28 +393,42 @@ export default {
 
       if (!isUndefined(data.author)) {
         const { author, notes } = data;
-        this.$store.commit('app/setAuthor', escape(author));
-        this.$store.commit('app/setNotes', escape(notes));
+        this.setAuthor(escape(author));
+        this.setNotes(escape(notes));
       }
-      this.$store.commit('app/setKeyboard', data.keyboard);
-      this.$store.dispatch('app/changeKeyboard', this.keyboard).then(() => {
-        this.$store.commit('app/setLayout', data.layout);
+
+      // remap old json files to new mappings if they need it
+      data = Object.assign(
+        data,
+        this.remapKeyboard(data.keyboard, data.layout)
+      );
+
+      this.setKeyboard(data.keyboard);
+      this.changeKeyboard(this.keyboard).then(() => {
+        this.setLayout(data.layout);
         // todo validate these values
-        this.$router.replace({
-          path: `/${data.keyboard}/${data.layout}`
-        });
+        this.$router
+          .replace({
+            path: `/${data.keyboard}/${data.layout}`
+          })
+          .catch(err => {
+            if (err.name !== 'NavigationDuplicated') {
+              // ignore nav errors
+              console.error(err);
+            }
+          });
 
         var store = this.$store;
         let promise = new Promise(resolve =>
-          store.commit('keymap/setLoadingKeymapPromise', resolve)
+          this.setLoadingKeymapPromise(resolve)
         );
         promise.then(() => {
           const stats = load_converted_keymap(data.layers);
-          const msg = this.$t('message.statsTemplate', stats);
-          store.commit('status/deferredMessage', msg);
-          store.dispatch('status/viewReadme', this.keyboard).then(() => {
-            store.commit('app/setKeymapName', data.keymap);
-            store.commit('keymap/setDirty');
+          const msg = this.$t('statsTemplate', stats);
+          this.deferredMessage(msg);
+          this.viewReadme(this.keyboard).then(() => {
+            this.setKeymapName(data.keymap);
+            this.setDirty();
           });
         });
         disableOtherButtons();
@@ -403,7 +440,7 @@ export default {
         this.loadJsonData(data);
       } catch (error) {
         console.log(error);
-        alert(this.$t('message.errors.invalidQMKKeymap'));
+        alert(this.$t('errors.invalidQMKKeymap'));
         return;
       }
     },
@@ -412,7 +449,7 @@ export default {
       if (files.length === 0) {
         return;
       }
-      this.$store.commit('app/enablePreview');
+      this.enablePreview();
       disableCompileButton();
       this.reader = new FileReader();
       this.reader.onload = this.previewInfoOnLoad;
@@ -430,7 +467,7 @@ export default {
         return;
       }
 
-      this.$store.commit('app/setKeyboard', PREVIEW_LABEL);
+      this.setKeyboard(PREVIEW_LABEL);
       /*
        * Preview Mode State hack
        * When we load a info.json preview we are bypassing the normal XHR request to the backend for
@@ -447,19 +484,18 @@ export default {
        * TODO come up with a better way of resetting keymap than depending on visual keymap change detection
        */
       const store = this.$store;
-      this.$store.dispatch('app/loadLayouts', data).then(() => {
+      this.loadLayouts(data).then(() => {
         // This is a special hack to get around change detection
-        this.$store.commit('app/setLayout', '  ');
+        this.setLayout('  ');
         Vue.nextTick(() => {
           const layout = getPreferredLayout(store.state.app.layouts);
-          store.commit('keymap/clear');
-          store.commit('app/setLayout', layout);
+          this.clearKeymap();
+          this.setLayout(layout);
           // clear the keymap data is now responsibility of code that changes layout
-          store.commit('keymap/clear');
-          store.commit('app/setKeymapName', 'info.json preview');
-          store.commit('status/clear');
-          store.commit(
-            'status/append',
+          this.clearKeymap();
+          this.setKeymapName('info.json preview');
+          this.clearStatus();
+          this.append(
             [
               'Preview info.json mode\n',
               'For Developers only, working on new keyboards.\n',
@@ -492,9 +528,6 @@ export default {
 };
 </script>
 <style>
-#controller-bottom button {
-  margin-top: 4px;
-}
 .input-url-modal {
   padding: 5px;
   border: 1px solid;
@@ -543,7 +576,7 @@ export default {
   font-weight: bold;
   height: 19px;
   border: 0px solid;
-  padding: 6px 12px 6px;
+  padding: 5px 8px;
   text-transform: uppercase;
 }
 @media (max-width: 90rem) {

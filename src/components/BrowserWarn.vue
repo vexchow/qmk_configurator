@@ -1,12 +1,18 @@
 <template>
   <div id="browser-warn" v-show="isNotSupported && !isDimissed">
     <a class="dismiss" title="dismiss" v-on:click="dismiss">X</a>
-    {{ $t('message.errors.unsupportedBrowser') }}
-    <a href="https://www.google.com/intl/en_us/chrome/" target="_blank"
+    {{ $t('errors.unsupportedBrowser') }}
+    <a
+      href="https://www.google.com/intl/en_us/chrome/"
+      target="_blank"
+      rel="noopener"
       >Google Chrome</a
     >
     /
-    <a href="https://www.mozilla.org/en-US/firefox/new/" target="_blank"
+    <a
+      href="https://www.mozilla.org/en-US/firefox/new/"
+      target="_blank"
+      rel="noopener"
       >Mozilla Firefox</a
     >
   </div>
