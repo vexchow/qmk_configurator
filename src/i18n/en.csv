@@ -44,8 +44,10 @@ keycodesRef:label,Keycodes reference
 keycodesTab:ANSI:label,ANSI
 keycodesTab:AppMediaMouse:label,"App, Media and Mouse"
 keycodesTab:ISO/JIS:label,ISO/JIS
+keycodesTab:JP:label,JP
 keycodesTab:KeyboardSettings:label,Keyboard Settings
 keycodesTab:Quantum:label,Quantum
+keycodesTab:BMP:label,"BLE Micro Pro"
 keymap:label,Keymap
 keymapName:label,Keymap Name
 keymapName:placeholder,custom keymap name

@@ -59,11 +59,12 @@
     <button
       id="get-version"
       @click="getVersion"
+      title="Get version of BLE Micro Pro"
       v-bind:disabled="!webSerialElementEnabled"
     >
       VERSION
     </button>
-    <label style="margin-left:10px"
+    <label style="margin-left:10px" title="Send command to BLE Micro Pro"
       >COMMAND
       <input
         type="text"

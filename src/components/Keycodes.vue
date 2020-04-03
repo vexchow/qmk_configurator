@@ -21,7 +21,7 @@
             href="https://github.com/sekigon-gonnoc/BLE-Micro-Pro/blob/master/AboutDefaultFirmware/doc/bmp_custom_keycode.md"
             title="BMP keycodes reference"
             target="_blank"
-            >{{ $t('message.keycodesRefBmp.label') }}</a
+            >Keycodes of BLE Micro Pro</a
           >
         </span>
       </p>
