@@ -206,7 +206,7 @@ var WebSerial = /** @class */ (function() {
             }
             _b.label = 1;
           case 1:
-            _b.trys.push([1, 6, , 7]);
+            _b.trys.push([1, 6, , 8]);
             this.reader = this.port.readable.getReader();
             console.log('start read loop');
             _b.label = 2;
@@ -231,16 +231,18 @@ var WebSerial = /** @class */ (function() {
           case 4:
             return [3 /*break*/, 2];
           case 5:
-            return [3 /*break*/, 7];
+            return [3 /*break*/, 8];
           case 6:
             e_1 = _b.sent();
             console.error(e_1);
             if (this.errorCallback) {
               this.errorCallback(e_1);
             }
-            this.close();
-            return [3 /*break*/, 7];
+            return [4 /*yield*/, this.close()];
           case 7:
+            _b.sent();
+            return [3 /*break*/, 8];
+          case 8:
             return [2 /*return*/];
         }
       });
@@ -289,7 +291,7 @@ var WebSerial = /** @class */ (function() {
   };
   WebSerial.prototype.close = function() {
     return __awaiter(this, void 0, void 0, function() {
-      var e_2;
+      var e_2, e_3;
       return __generator(this, function(_a) {
         switch (_a.label) {
           case 0:
@@ -318,15 +320,20 @@ var WebSerial = /** @class */ (function() {
             if (this.closeCallback) {
               this.closeCallback();
             }
-            if (this.port) {
-              try {
-                this.port.close();
-              } catch (e) {
-                console.error(e);
-              } finally {
-                this.port = null;
-              }
-            }
+            if (!this.port) return [3 /*break*/, 9];
+            _a.label = 6;
+          case 6:
+            _a.trys.push([6, 8, , 9]);
+            return [4 /*yield*/, this.port.close()];
+          case 7:
+            _a.sent();
+            this.port = null;
+            return [3 /*break*/, 9];
+          case 8:
+            e_3 = _a.sent();
+            console.error(e_3);
+            return [3 /*break*/, 9];
+          case 9:
             console.log('serial port closed');
             return [2 /*return*/];
         }

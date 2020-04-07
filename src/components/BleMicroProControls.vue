@@ -232,7 +232,28 @@ export default {
             this.webSerialElementEnabled = false;
           }).bind(this)
         );
-        await this.$webSerial.open();
+
+        // ensure previous port is closed
+        try {
+          await this.$webSerial.close();
+        } catch (e) {}
+
+        try {
+          await this.$webSerial.open();
+        } catch (e) {
+          this.$store.commit('status/append', 'Fail to open the port.\r\n');
+          console.error(e);
+
+          try {
+            this.$webSerial.close();
+          } catch (e) {
+            console.error(e);
+          }
+
+          this.webSerialElementEnabled = false;
+          return;
+        }
+
         this.webSerialElementEnabled = true;
 
         this.$webSerial.writeString = msg => {
