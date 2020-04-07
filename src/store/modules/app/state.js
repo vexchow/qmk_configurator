@@ -35,6 +35,7 @@ const state = {
   _keyboards: [],
   layout: '',
   layouts: {},
+  estimatedLayout: {},
   keymapName: '',
   compileDisabled: true,
   isPreview: false,

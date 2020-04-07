@@ -23,19 +23,12 @@
       :class="terminalClasses"
       @click="toggleTerminal"
     />
-    <!-- <label                                             -->
-    <!--   for="expand-terminal"                            -->
-    <!--   id="expand-terminal-label"                       -->
-    <!--   :class="terminalClasses"                         -->
-    <!--   @click="expandTerminal"                          -->
-    <!--   >{{ $t('message.expandTerminal.label') }}</label -->
-    <!-- >                                                  -->
     <font-awesome-icon
       icon="chevron-up"
       size="lg"
       fixed-width
       id="expand-terminal"
-      :title="$t('message.expandTerminal.title')"
+      title="Expand/Collapse the Terminal display"
       :class="terminalClasses"
       @click="expandTerminal"
     />
@@ -44,6 +37,7 @@
       size="lg"
       fixed-width
       id="clear-terminal"
+      title="Clear the Terminal display"
       :class="terminalClasses"
       @click="clearTerminal"
     />

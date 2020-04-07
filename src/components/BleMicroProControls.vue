@@ -40,7 +40,7 @@
       CONNECT BY SERIAL
     </button>
     <button
-      id="load-keymap-webSerial"
+      id="read-keymap-webSerial"
       title="Read keymap.json from BLE Micro Pro"
       @click="readKeymapWebSerial"
       v-bind:disabled="!webSerialElementEnabled"
@@ -79,7 +79,7 @@
 
 <script>
 import Vue from 'vue';
-import { mapMutations } from 'vuex';
+import { mapMutations, mapActions, mapState, mapGetters } from 'vuex';
 
 import { toggleConnection, nusSendString, setCallbackFunc } from '@/webBT';
 import { WebSerial } from '@/webSerial';
@@ -89,7 +89,11 @@ Vue.prototype.$webSerial = new WebSerial(64, 30);
 export default {
   name: 'ble-micro-pro-control',
   methods: {
-    ...mapMutations('app', ['stopListening', 'startListening']),
+    ...mapMutations('app', [
+      'stopListening',
+      'startListening',
+      'setEstimatedLayout'
+    ]),
     connectWebBT() {
       console.log('connectWebBT');
       toggleConnection();
@@ -134,11 +138,41 @@ export default {
       this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
       nusSendString('show keymap');
     },
+    estimateLayout(config) {
+      let layout = config.matrix.layout;
+      let estmiated_layout = { LAYOUT: [] };
+      let rows = [];
+
+      for (;;) {
+        let end = layout.indexOf(0);
+        if (end == -1) {
+          rows.push(layout);
+          break;
+        } else {
+          rows.push(layout.slice(0, end));
+          layout = layout.slice(end + 1);
+        }
+      }
+
+      rows.forEach((row, row_idx) => {
+        row.forEach((col, col_idx) => {
+          estmiated_layout.LAYOUT.push({ x: col_idx, y: row_idx });
+        });
+      });
+
+      return estmiated_layout;
+    },
     serialRecvCallback(array) {
       let replacer = (match, offset, string) => {
         return match.replace(/(\n|\r\n|\n\r)/gm, '\\n');
       };
-      this.serial_rcv += String.fromCharCode.apply(null, array);
+      let receive_packet = String.fromCharCode.apply(null, array);
+      this.serial_rcv += receive_packet;
+
+      this.$store.commit(
+        'status/append',
+        receive_packet.replace(/(\x00|\n|\r\n|\n\r)/gm, '\r\n')
+      );
 
       if (this.serial_rcv.indexOf('\0') != -1) {
         let strs = this.serial_rcv.split('\0');
@@ -150,22 +184,16 @@ export default {
           str = str.replace(/\"[\s\S]*?\"/gm, replacer);
           try {
             let json = JSON.parse(str);
-            if (json.layers) {
+            if (
+              json.config &&
+              json.config.matrix &&
+              json.config.matrix.layout
+            ) {
+              let layout = this.estimateLayout(json.config);
+              this.setEstimatedLayout(layout);
+            } else if (json.layers) {
               // this.loadJsonData(json);
               this.$emit('receive-keymap', json);
-            } else if (json.dmsg) {
-              this.$store.commit('status/append', json.dmsg);
-            } else if (json.log) {
-              this.$store.commit('status/append', json.log + '\r\n');
-            } else if (json.version) {
-              this.$store.commit(
-                'status/append',
-                'Bootloader Version:' + json.version.bootloader + '\r\n\r\n'
-              );
-              this.$store.commit(
-                'status/append',
-                'Application Version:\r\n' + json.version.app + '\r\n'
-              );
             }
           } catch (e) {
             this.$store.commit(
@@ -174,12 +202,12 @@ export default {
                 'invalid data:' +
                 str
             );
-          } finally {
-            this.$store.commit('status/startScroll');
           }
         }
         this.serial_rcv = '';
       }
+
+      this.$store.commit('status/startScroll');
     },
     async connectWebSerial() {
       console.log('connectWebSerial');
@@ -200,6 +228,7 @@ export default {
         this.$webSerial.setReceiveCallback(this.serialRecvCallback.bind(this));
         this.$webSerial.setCloseCallback(
           (() => {
+            this.$store.commit('status/append', 'Serial connection is closed');
             this.webSerialElementEnabled = false;
           }).bind(this)
         );
@@ -211,7 +240,10 @@ export default {
         };
 
         // enable debug message
-        await this.$webSerial.writeString('\n\ndebug on\n');
+        await this.$webSerial.writeString('\0\ndebug on\n');
+        // read keymap
+        await this.$webSerial.writeString('conf\n');
+        await this.$webSerial.writeString('map\n');
       }
     },
     async sendKeymapWebSerial() {
@@ -243,10 +275,11 @@ export default {
       await this.$webSerial.writeString('\0\nfile keymap\n' + str + '\x00\x03');
       // await this.$store.commit('app/setShowSpinner', false);
     },
-    readKeymapWebSerial() {
+    async readKeymapWebSerial() {
       console.log('readKeymapWebSerial');
       this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
-      this.$webSerial.writeString('\0\nmap\n');
+      await this.$webSerial.writeString('\0\nconf\n');
+      await this.$webSerial.writeString('\0\nmap\n');
     },
     saveToRomWebSerial() {
       console.log('save keymap to rom');

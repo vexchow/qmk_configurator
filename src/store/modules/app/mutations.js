@@ -171,6 +171,9 @@ const mutations = {
   },
   toggleSnowflakes(state) {
     state.snowflakes = !state.snowflakes;
+  },
+  setEstimatedLayout(state, layout) {
+    state.estimatedLayout = layout;
   }
 };
 

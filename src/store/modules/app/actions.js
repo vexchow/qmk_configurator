@@ -132,6 +132,14 @@ const actions = {
         .then(resp => {
           commit('processLayouts', resp);
           return resp;
+        })
+        .catch(() => {
+          console.log(
+            'Failed to find layout info from servers.' +
+              'Use alternative information from config.json'
+          );
+          state.layouts = state.estimatedLayout;
+          return null;
         });
     }
   },
