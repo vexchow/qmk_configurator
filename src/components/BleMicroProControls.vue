@@ -59,11 +59,11 @@
     </button>
     <button
       id="import-config"
-      title="Import and send config.json"
+      title="Import and send config.json or tapterm.json"
       @click="importConfig"
       v-bind:disabled="!webSerialElementEnabled"
     >
-      CONFIG
+      CONFIG/TAPTERM
     </button>
     <button
       id="get-version"
@@ -352,13 +352,17 @@ export default {
         try {
           const json_str = this.reader.result;
           console.log(json_str);
-          const config = JSON.parse(json_str);
-          console.log(config);
-          if (config.config) {
+          const json = JSON.parse(json_str);
+          console.log(json);
+          if (json.config) {
             await this.$webSerial.writeString('\0\nfile config\n');
-            await this.$webSerial.writeString(JSON.stringify(config) + '\0');
+            await this.$webSerial.writeString(json_str + '\0');
             await this.$webSerial.writeString('\nupdate 0\n');
             await this.$webSerial.writeString('reset\n');
+          } else if (json.tapping_term) {
+            await this.$webSerial.writeString('\0\nfile tapterm\n');
+            await this.$webSerial.writeString(json_str + '\0');
+            await this.$webSerial.writeString('\nupdate 2\n');
           } else {
             this.$store.commit(
               'status/append',
