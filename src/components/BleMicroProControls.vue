@@ -2,7 +2,7 @@
   <div class="botctrl-2">
     <button
       id="save-keymap-webBT"
-      :title="$t('message.saveKeymapWebBT.title')"
+      title="Save keymap.json to BLE Micro Pro by BT"
       @click="saveKeymapWebBT"
       v-bind:disabled="!webBtElementEnabled"
     >
@@ -10,14 +10,14 @@
     </button>
     <button
       id="connect-webBT"
-      :title="$t('message.connectWebBT.title')"
+      title="Toggle connection with BLE Micro Pro"
       @click="connectWebBT"
     >
       CONNECT BY BT
     </button>
     <button
       id="load-keymap-webBT"
-      :title="$t('message.loadKeymapWebBT.title')"
+      title="Read keymap.json from BLE Micro Pro"
       @click="loadKeymapWebBT"
       v-bind:disabled="!webBtElementEnabled"
       style="margin-right:10px"
@@ -117,6 +117,7 @@ export default {
       setCallbackFunc({
         parser: json => {
           this.$emit('receive-keymap', json);
+          this.$store.commit('status/append', 'finish\r\n');
         },
         onConnect: () => {
           this.webBtElementEnabled = true;
@@ -137,22 +138,23 @@ export default {
 
       //API payload format
       let data = {
-        keyboard: this.keyboard,
-        keymap: this.exportKeymapName,
-        layout: this.layout,
+        keyboard: this.$store.state.app.keyboard,
+        keymap: this.$store.getters['app/exportKeymapName'],
+        layout: this.$store.state.app.layout,
         layers: layers,
-        author: this.author,
-        notes: this.notes,
-        serial_rcv: ''
+        author: '',
+        notes: ''
       };
 
-      this.$store.commit('status/append', 'saving keymap to keyboard\r\n');
+      this.$store.commit('status/append', 'saving keymap to keyboard...');
       // console.log(JSON.stringify(data));
       nusSendString(JSON.stringify(data));
+
+      this.$store.commit('status/append', 'finish\r\n');
     },
     loadKeymapWebBT() {
       console.log('loadKeymapWebBT');
-      this.$store.commit('status/append', 'loading keymap from keyboard\r\n');
+      this.$store.commit('status/append', 'loading keymap from keyboard...');
       nusSendString('show keymap');
     },
     estimateLayout(config) {
@@ -383,6 +385,7 @@ export default {
     return {
       webBtElementEnabled: false,
       webSerialElementEnabled: false,
+      serial_rcv: '',
       reader: undefined
     };
   }

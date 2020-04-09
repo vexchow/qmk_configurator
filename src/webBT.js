@@ -153,13 +153,18 @@ function handleNotifications(event) {
     str += String.fromCharCode(value.getUint8(i));
   }
   if (str.indexOf('\0') != -1) {
-    str = str.split('\0')[0];
-    console.log(str);
-    let obj = JSON.parse(str);
-    console.log(obj);
+    try {
+      str = str.split('\0')[0];
+      console.log(str);
+      let obj = JSON.parse(str);
+      console.log(obj);
 
-    jsonParseFunc(obj);
-    str = '';
+      jsonParseFunc(obj);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      str = '';
+    }
   }
 }
 
