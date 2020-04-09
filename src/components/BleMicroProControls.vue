@@ -55,6 +55,15 @@
       v-bind:disabled="!webSerialElementEnabled"
     >
       <font-awesome-icon icon="save" size="lg" fixed-width />
+      KEYMAP
+    </button>
+    <button
+      id="import-config"
+      title="Import and send config.json"
+      @click="importConfig"
+      v-bind:disabled="!webSerialElementEnabled"
+    >
+      CONFIG
     </button>
     <button
       id="get-version"
@@ -74,12 +83,20 @@
         @keyup.enter="sendCommand"
         v-bind:disabled="!webSerialElementEnabled"
     /></label>
+    <input
+      id="fileImport"
+      type="file"
+      ref="fileImportElement"
+      accept="application/json,.JSN"
+      @change="fileImportChanged"
+    />
   </div>
 </template>
 
 <script>
 import Vue from 'vue';
 import { mapMutations, mapActions, mapState, mapGetters } from 'vuex';
+import first from 'lodash/first';
 
 import { toggleConnection, nusSendString, setCallbackFunc } from '@/webBT';
 import { WebSerial } from '@/webSerial';
@@ -155,7 +172,7 @@ export default {
       }
 
       rows.forEach((row, row_idx) => {
-        row.forEach((col, col_idx) => {
+        row.forEach((key, col_idx) => {
           estmiated_layout.LAYOUT.push({ x: col_idx, y: row_idx });
         });
       });
@@ -193,6 +210,9 @@ export default {
               this.setEstimatedLayout(layout);
             } else if (json.layers) {
               // this.loadJsonData(json);
+              if (json.keyboard == '') {
+                json.keyboard = 'ble_micro_pro';
+              }
               this.$emit('receive-keymap', json);
             }
           } catch (e) {
@@ -320,6 +340,38 @@ export default {
       this.$webSerial.writeString(e.target.value + '\n');
       e.target.value = '';
     },
+    importConfig() {
+      this.$refs.fileImportElement.click();
+    },
+    fileImportChanged() {
+      var files = this.$refs.fileImportElement.files;
+      this.reader = new FileReader();
+      this.reader.onload = async () => {
+        try {
+          const json_str = this.reader.result;
+          console.log(json_str);
+          const config = JSON.parse(json_str);
+          console.log(config);
+          if (config.config) {
+            await this.$webSerial.writeString('\0\nfile config\n');
+            await this.$webSerial.writeString(JSON.stringify(config) + '\0');
+            await this.$webSerial.writeString('\nupdate 0\n');
+            await this.$webSerial.writeString('reset\n');
+          } else {
+            this.$store.commit(
+              'status/append',
+              'This file does not contain config information.\r\n'
+            );
+          }
+        } catch (e) {
+          console.error(e);
+          this.$store.commit('status/append', 'Failed to load JSON data.\r\n');
+          return;
+        }
+      };
+      this.reader.readAsText(first(files));
+      this.$refs.fileImportElement.value = '';
+    },
     focus() {
       this.stopListening();
     },
@@ -330,7 +382,8 @@ export default {
   data: () => {
     return {
       webBtElementEnabled: false,
-      webSerialElementEnabled: false
+      webSerialElementEnabled: false,
+      reader: undefined
     };
   }
 };

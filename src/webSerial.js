@@ -215,7 +215,7 @@ var WebSerial = /** @class */ (function() {
           case 3:
             (_a = _b.sent()), (done = _a.done), (value = _a.value);
             if (value) {
-              console.log('serial received:', value);
+              console.log(`serial received: ${value.length} bytes`);
               if (this.receiveCallback) {
                 this.receiveCallback(value);
               }
