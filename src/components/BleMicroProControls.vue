@@ -73,16 +73,16 @@
     >
       VERSION
     </button>
-    <label style="margin-left:10px" title="Send command to BLE Micro Pro"
-      >COMMAND
-      <input
-        type="text"
-        id="command-input"
-        @focus="focus"
-        @blur="blur"
-        @keyup.enter="sendCommand"
-        v-bind:disabled="!webSerialElementEnabled"
-    /></label>
+    <input
+      type="text"
+      id="command-input"
+      placeholder="Command"
+      style="margin-left:10px"
+      @focus="focus"
+      @blur="blur"
+      @keyup.enter="sendCommand"
+      v-bind:disabled="!webSerialElementEnabled"
+    />
     <input
       id="fileImport"
       type="file"
