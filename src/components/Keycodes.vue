@@ -18,7 +18,7 @@
         </span>
         <span class="hint-right hint">
           <a
-            href="https://github.com/sekigon-gonnoc/BLE-Micro-Pro/blob/master/AboutDefaultFirmware/doc/bmp_custom_keycode.md"
+            href="https://sekigon-gonnoc.github.io/BLE-Micro-Pro/#/edit_keymap_file?id=ble-micro-pro%e5%9b%ba%e6%9c%89%e3%81%ae%e3%82%ad%e3%83%bc%e3%82%b3%e3%83%bc%e3%83%89"
             title="BMP keycodes reference"
             target="_blank"
             >Keycodes of BLE Micro Pro</a
