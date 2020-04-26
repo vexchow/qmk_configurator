@@ -65,14 +65,6 @@
     >
       CONFIG/TAPTERM
     </button>
-    <button
-      id="get-version"
-      @click="getVersion"
-      title="Get version of BLE Micro Pro"
-      v-bind:disabled="!webSerialElementEnabled"
-    >
-      VERSION
-    </button>
     <input
       type="text"
       id="command-input"
@@ -83,6 +75,14 @@
       @keyup.enter="sendCommand"
       v-bind:disabled="!webSerialElementEnabled"
     />
+    <input
+      type="checkbox"
+      id="debug-enabled"
+      v-bind:disabled="!webSerialElementEnabled"
+      v-model="debugEnabled"
+      @change="toggleDebug"
+    />
+    <label for="debug-enabled">Debug message</label>
     <input
       id="fileImport"
       type="file"
@@ -283,7 +283,7 @@ export default {
         };
 
         // enable debug message
-        await this.$webSerial.writeString('\0\ndebug on\n');
+        await this.setDebugEnabled(this.debugEnabled);
         // read keymap
         await this.$webSerial.writeString('conf\n');
         await this.$webSerial.writeString('map\n');
@@ -342,6 +342,16 @@ export default {
       this.$webSerial.writeString(e.target.value + '\n');
       e.target.value = '';
     },
+    async setDebugEnabled(enabled) {
+      if (enabled) {
+        await this.$webSerial.writeString('\0\ndebug on\n');
+      } else {
+        await this.$webSerial.writeString('\0\ndebug off\n');
+      }
+    },
+    async toggleDebug(e) {
+      this.setDebugEnabled(e.target.checked);
+    },
     importConfig() {
       this.$refs.fileImportElement.click();
     },
@@ -390,7 +400,8 @@ export default {
       webBtElementEnabled: false,
       webSerialElementEnabled: false,
       serial_rcv: '',
-      reader: undefined
+      reader: undefined,
+      debugEnabled: true
     };
   }
 };
