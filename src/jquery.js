@@ -535,6 +535,7 @@ function getExclusionList() {
     'spacetime',
     'suihankey',
     'suihankey/split',
+    'test'
     'treadstone48',
     'uzu42',
     'vitamins_included',
