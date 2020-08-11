@@ -535,7 +535,7 @@ function getExclusionList() {
     'spacetime',
     'suihankey',
     'suihankey/split',
-    'test'
+    'testtest'
     'treadstone48',
     'uzu42',
     'vitamins_included',
@@ -548,7 +548,7 @@ function getExclusionList() {
 }
 
 function getInternalInfoList() {
-  return ['kugel', 'toybox','test'];
+  return ['kugel', 'toybox','testtest'];
 }
 
 function compileLayout(_keyboard, _keymapName, _layout) {
